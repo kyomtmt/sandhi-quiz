@@ -88,6 +88,7 @@
     let index = 0;
     let correctCount = 0;
     let totalAnswered = 0;
+    let incorrectIndexes = [];
 
     const questions = [
       { question: "na asti → ______", options: ["naasti", "nāsti", "nāāsti"], answer: 1, explanation: "-a + a は ā に融合する。したがって b) nāsti が正解。" },
@@ -110,6 +111,7 @@
       { question: "tau ubhau api → ______", options: ["tāv ubhāv api", "tau ubhauapi", "tāubhāv api"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv は語形変化、2) ubhau + api は au + a の母音サンディで āv になります。したがって a) tāv ubhāv api が正解。" }
     ];
 
+    
     function showQuestion() {
       const q = questions[index];
       quizEl.innerHTML = `
@@ -133,6 +135,7 @@
             btn.classList.add('correct');
           } else {
             btn.classList.add('incorrect');
+            incorrectIndexes.push(index);
           }
         } else if (i === q.answer) {
           btn.classList.add('correct');
@@ -150,12 +153,26 @@
         quizEl.innerHTML = `
           <div style="text-align: center; margin-top: 50px;">
             <h2 style="font-size: 2em; color: #1e88e5;">お疲れさまです。${questions.length}問中、${correctCount}問正解です！</h2>
-            <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; font-size: 1em;">もう一度挑戦</button>
+            <button onclick="location.reload()" style="margin: 10px; padding: 10px 20px; font-size: 1em;">もう一度挑戦</button>
+            <button onclick="retryIncorrect()" style="margin: 10px; padding: 10px 20px; font-size: 1em;">間違った問題に挑戦</button>
           </div>
         `;
       } else {
         showQuestion();
       }
+    }
+
+    function retryIncorrect() {
+      if (incorrectIndexes.length === 0) {
+        alert("間違った問題はありません。");
+        return;
+      }
+      questions.splice(0, questions.length, ...incorrectIndexes.map(i => questions[i]));
+      index = 0;
+      correctCount = 0;
+      totalAnswered = 0;
+      incorrectIndexes = [];
+      showQuestion();
     }
 
     showQuestion();
