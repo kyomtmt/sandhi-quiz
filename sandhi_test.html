@@ -134,13 +134,13 @@
   <button class="next-btn" onclick="showNextQuestion()">次へ</button>
   <script>
     const quizEl = document.getElementById('quiz');
-let index = 0;
-let correctCount = 0;
-let incorrectIndexes = [];
+    let index = 0;
+    let correctCount = 0;
+    let incorrectIndexes = [];
 
-const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
-const questions = shuffle([
+    const questions = shuffle([
   { question: "na asti → ______", options: ["naasti", "nāsti", "nāāsti"], answer: 1, explanation: "-a + a は ā に融合する。したがって b) nāsti が正解。" },
   { question: "sā api → ______", options: ["sāpi", "sāāpi", "saapi"], answer: 0, explanation: "-ā + a は ā に融合する。したがって a) sāpi が正解。" },
   { question: "asti iha → ______", options: ["astīha", "astiha", "astiīha"], answer: 0, explanation: "-i + ī は ī に融合。したがって a) astīha が正解。" },
@@ -159,72 +159,68 @@ const questions = shuffle([
   { question: "te api → ______", options: ["teʼpi", "tepi", "te api"], answer: 0, explanation: "-e + a は a 脱落しアヴァグラハ（ʼ）で表記。したがって a) teʼpi が正解。" },
   { question: "prabho atra → ______", options: ["prabhoʼtra", "prabhoatra", "prabhātra"], answer: 0, explanation: "-o + a は a 脱落しアヴァグラハ。したがって a) prabhoʼtra が正解。" },
   { question: "tau ubhau api → ______", options: ["tāv ubhāv api", "tau ubhauapi", "tāubhāv api"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv は語形変化、2) ubhau + api は au + a の母音サンディで āv になります。したがって a) tāv ubhāv api が正解。" }
-]);
+    ]);
 
-function showQuestion() {
-  quizEl.innerHTML = '';
-  const q = questions[index];
-  const shuffledOptions = shuffle([...q.options]);
-  quizEl.innerHTML += `<div class='question'>Q${index + 1}: ${q.question}</div>`;
-  quizEl.innerHTML += `<div class='options'>${shuffledOptions.map((opt, i) => `<button onclick='selectAnswer(this, "${opt}", "${q.options[q.answer]}", ${i})'>${String.fromCharCode(97+i)}) ${opt}</button>`).join('')}</div>`;
-  quizEl.innerHTML += `<div class='score'>正解数: ${correctCount} / ${questions.length}</div>`;
-}
 
-function selectAnswer(button, selected, correct, i) {
-  const buttons = document.querySelectorAll(".options button");
-  buttons.forEach(b => b.disabled = true);
-  if (selected === correct) {
-    button.classList.add("correct");
-    correctCount++;
-  } else {
-    button.classList.add("incorrect");
-    buttons.forEach(b => { if (b.textContent.includes(correct)) b.classList.add("correct"); });
-    incorrectIndexes.push(index);
-  }
-  const explanation = questions[index].explanation;
-  quizEl.innerHTML += `<div class='explanation'>${explanation}</div>`;
-}
+    function showQuestion() {
+      quizEl.innerHTML = '';
+      const q = questions[index];
+      const shuffledOptions = shuffle([...q.options]);
+      quizEl.innerHTML += `<div class='question'>Q${index + 1}: ${q.question}</div>`;
+      quizEl.innerHTML += `<div class='options'>${shuffledOptions.map((opt, i) => `<button onclick='selectAnswer(this, "${opt}", "${q.options[q.answer]}", ${i})'>${String.fromCharCode(97+i)}) ${opt}</button>`).join('')}</div>`;
+      quizEl.innerHTML += `<div class='score'>正解数: ${correctCount} / ${questions.length}</div>`;
+    }
 
-function showNextQuestion() {
-  if (index < questions.length - 1) {
-    index++;
+    function selectAnswer(button, selected, correct, i) {
+      const buttons = document.querySelectorAll(".options button");
+      buttons.forEach(b => b.disabled = true);
+      if (selected === correct) {
+        button.classList.add("correct");
+        correctCount++;
+      } else {
+        button.classList.add("incorrect");
+        buttons.forEach(b => { if (b.textContent.includes(correct)) b.classList.add("correct"); });
+        incorrectIndexes.push(index);
+      }
+      const explanation = questions[index].explanation;
+      quizEl.innerHTML += `<div class='explanation'>${explanation}</div>`;
+    }
+
+    function showNextQuestion() {
+      if (index < questions.length - 1) {
+        index++;
+        showQuestion();
+      } else {
+        const percentage = correctCount / questions.length;
+        let colorClass = 'green';
+        if (percentage < 0.4) colorClass = 'red';
+        else if (percentage < 0.7) colorClass = 'orange';
+
+        let resultHTML = `<div class='result ${colorClass}'>お疲れさまです。${questions.length}問中、${correctCount}問正解です！</div><div class='result-buttons'>`;
+
+        if (incorrectIndexes.length > 0) {
+          resultHTML += `<button class='wrong-btn' onclick='retryIncorrect()'>間違った問題に挑戦</button>`;
+        }
+
+        resultHTML += `<button class='retry-btn' onclick='location.reload()'>もう一度挑戦</button></div>`;
+
+        quizEl.innerHTML = resultHTML;
+        document.querySelector(".next-btn").style.display = "none";
+      }
+    }
+
+    function retryIncorrect() {
+      const wrongQuestions = incorrectIndexes.map(i => questions[i]);
+      index = 0;
+      correctCount = 0;
+      incorrectIndexes = [];
+      questions.length = 0;
+      questions.push(...shuffle(wrongQuestions));
+      document.querySelector(".next-btn").style.display = "block";
+      showQuestion();
+    }
+
     showQuestion();
-  } else {
-    showFinalResult();
-    document.querySelector(".next-btn").style.display = "none";
-  }
-}
-
-function showFinalResult() {
-  const rate = correctCount / questions.length;
-  let color = 'red';
-  if (rate >= 0.8) color = 'green';
-  else if (rate >= 0.5) color = 'orange';
-
-  quizEl.innerHTML = `<div class='result ${color}'>お疲れさまです。 ${questions.length}問中、${correctCount}問正解です！</div>`;
-
-  if (incorrectIndexes.length > 0) {
-    quizEl.innerHTML += `<div class='result-buttons'>
-      <button class='wrong-btn' onclick='retryIncorrect()'>間違った問題に挑戦</button>
-      <button class='retry-btn' onclick='location.reload()'>もう一度挑戦</button>
-    </div>`;
-  } else {
-    quizEl.innerHTML += `<div class='result-buttons'>
-      <button class='retry-btn' onclick='location.reload()'>もう一度挑戦</button>
-    </div>`;
-  }
-}
-
-function retryIncorrect() {
-  questions.splice(0, questions.length, ...incorrectIndexes.map(i => questions[i]));
-  index = 0;
-  correctCount = 0;
-  incorrectIndexes = [];
-  document.querySelector(".next-btn").style.display = "block";
-  showQuestion();
-}
-
-showQuestion();
   </script>
 </body>
 </html>
