@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>サンディクイズ</title>
+  <title>母音サンディクイズ</title>
   <style>
     body {
       font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
@@ -18,8 +18,6 @@
       margin-bottom: 30px;
       font-size: 2.2em;
       font-weight: bold;
-      letter-spacing: 0.05em;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
     .question {
       font-size: 1.4em;
@@ -45,7 +43,6 @@
       background: linear-gradient(to right, #64b5f6, #42a5f5);
       color: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: background 0.3s ease, transform 0.1s ease;
       width: 80%;
       max-width: 450px;
     }
@@ -59,16 +56,9 @@
       margin-top: 15px;
       border-left: 4px solid #42a5f5;
       border-radius: 4px;
-      max-width: 100%;
     }
-    .correct {
-      background: #66bb6a !important;
-      color: white !important;
-    }
-    .incorrect {
-      background: #ef5350 !important;
-      color: white !important;
-    }
+    .correct { background: #66bb6a !important; }
+    .incorrect { background: #ef5350 !important; }
     .score {
       margin-top: 10px;
       font-size: 1em;
@@ -82,62 +72,43 @@
       color: white;
       border: none;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       padding: 14px 28px;
       text-align: center;
       font-size: 1.2em;
+      cursor: pointer;
     }
     .next-btn:hover {
-      background-color: #2196f3;
+      background-color: #1e88e5;
     }
-    .result {
+    .back-to-menu {
       text-align: center;
-      font-size: 1.5em;
-      margin-top: 30px;
+      margin-top: 40px;
     }
-    .result.green { color: #43a047; }
-    .result.orange { color: #fbc02d; }
-    .result.red { color: #e53935; }
-    .result-buttons {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .result-buttons button {
-      display: block;
-      margin: 10px auto;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 1.2em;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .retry-btn {
+    .back-to-menu button {
       background-color: #9e9e9e;
       color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      cursor: pointer;
     }
-    .retry-btn:hover {
+    .back-to-menu button:hover {
       background-color: #757575;
-    }
-    .wrong-btn {
-      background-color: #42a5f5;
-      color: white;
-    }
-    .wrong-btn:hover {
-      background-color: #1e88e5;
     }
   </style>
 </head>
 <body>
-  <h1>サンディクイズ</h1>
+  <h1>母音サンディクイズ</h1>
   <div id="quiz"></div>
   <button class="next-btn" onclick="showNextQuestion()">次へ</button>
+  <div class="back-to-menu">
+    <button onclick="location.href='index.html'">メニューに戻る</button>
+  </div>
   <script>
     const quizEl = document.getElementById('quiz');
     let index = 0;
     let correctCount = 0;
-    let incorrectIndexes = [];
-
     const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
     const questions = shuffle([
@@ -161,7 +132,6 @@
   { question: "tau ubhau api → ______", options: ["tāv ubhāv api", "tau ubhauapi", "tāubhāv api"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv は語形変化、2) ubhau + api は au + a の母音サンディで āv になります。したがって a) tāv ubhāv api が正解。" }
     ]);
 
-
     function showQuestion() {
       quizEl.innerHTML = '';
       const q = questions[index];
@@ -171,7 +141,7 @@
       quizEl.innerHTML += `<div class='score'>正解数: ${correctCount} / ${questions.length}</div>`;
     }
 
-    function selectAnswer(button, selected, correct, i) {
+    function selectAnswer(button, selected, correct) {
       const buttons = document.querySelectorAll(".options button");
       buttons.forEach(b => b.disabled = true);
       if (selected === correct) {
@@ -179,8 +149,9 @@
         correctCount++;
       } else {
         button.classList.add("incorrect");
-        buttons.forEach(b => { if (b.textContent.includes(correct)) b.classList.add("correct"); });
-        incorrectIndexes.push(index);
+        buttons.forEach(b => {
+          if (b.textContent.includes(correct)) b.classList.add("correct");
+        });
       }
       const explanation = questions[index].explanation;
       quizEl.innerHTML += `<div class='explanation'>${explanation}</div>`;
@@ -191,33 +162,9 @@
         index++;
         showQuestion();
       } else {
-        const percentage = correctCount / questions.length;
-        let colorClass = 'green';
-        if (percentage < 0.4) colorClass = 'red';
-        else if (percentage < 0.7) colorClass = 'orange';
-
-        let resultHTML = `<div class='result ${colorClass}'>お疲れさまです。${questions.length}問中、${correctCount}問正解です！</div><div class='result-buttons'>`;
-
-        if (incorrectIndexes.length > 0) {
-          resultHTML += `<button class='wrong-btn' onclick='retryIncorrect()'>間違った問題に挑戦</button>`;
-        }
-
-        resultHTML += `<button class='retry-btn' onclick='location.reload()'>もう一度挑戦</button></div>`;
-
-        quizEl.innerHTML = resultHTML;
+        quizEl.innerHTML = `<div class='result green'>お疲れさまです。 ${questions.length}問中、${correctCount}問正解です！</div>`;
         document.querySelector(".next-btn").style.display = "none";
       }
-    }
-
-    function retryIncorrect() {
-      const wrongQuestions = incorrectIndexes.map(i => questions[i]);
-      index = 0;
-      correctCount = 0;
-      incorrectIndexes = [];
-      questions.length = 0;
-      questions.push(...shuffle(wrongQuestions));
-      document.querySelector(".next-btn").style.display = "block";
-      showQuestion();
     }
 
     showQuestion();
