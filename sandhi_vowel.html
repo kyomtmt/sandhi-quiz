@@ -112,24 +112,24 @@
     const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
     const questions = shuffle([
-  { question: "na asti → ______", options: ["naasti", "nāsti", "nāāsti"], answer: 1, explanation: "-a + a は ā に融合する。したがって b) nāsti が正解。" },
-  { question: "sā api → ______", options: ["sāpi", "sāāpi", "saapi"], answer: 0, explanation: "-ā + a は ā に融合する。したがって a) sāpi が正解。" },
-  { question: "asti iha → ______", options: ["astīha", "astiha", "astiīha"], answer: 0, explanation: "-i + ī は ī に融合。したがって a) astīha が正解。" },
-  { question: "sādhu uktam → ______", options: ["sādhuuktam", "sādhūktam", "sādhvuktam"], answer: 1, explanation: "-u + u は ū に融合する。したがって b) sādhūktam が正解。" },
-  { question: "kartṛ ṛju → ______", options: ["kartr̥ju", "kartṛṛju", "kartṝju"], answer: 2, explanation: "-ṛ + ṛ は ṝ に融合。したがって c) kartṝju が正解。" },
-  { question: "tava icchā → ______", options: ["tavecchā", "tavaicchā", "tavicchā"], answer: 0, explanation: "-a + i は e に融合する。したがって a) tavecchā が正解。" },
-  { question: "sā uktvā → ______", options: ["soktvā", "sāuktvā", "sāoktvā"], answer: 0, explanation: "-ā + u は o に融合する。したがって a) soktvā が正解。" },
-  { question: "yathā ṛtu → ______", options: ["yathartu", "yathārṭu", "yatharitu"], answer: 0, explanation: "-ā + ṛ は ar に融合する。したがって a) yathartu が正解。" },
-  { question: "tava eva → ______", options: ["tavaiva", "taveva", "tavāeva"], answer: 0, explanation: "-a + e は ai に融合する。したがって a) tavaiva が正解。" },
-  { question: "tava aiśvaryam → ______", options: ["tavaaiśvaryam", "tavaiśvaryam", "tavāiśvaryam"], answer: 1, explanation: "-ā + ai は ai に保持される。したがって b) tavaiśvaryam が正解。" },
-  { question: "sā oṣadhiḥ → ______", options: ["sauṣadhiḥ", "sāoṣadhiḥ", "sa oṣadhiḥ"], answer: 0, explanation: "-ā + o は au に融合する。したがって a) sauṣadhiḥ が正解。" },
-  { question: "tasya autsukyam → ______", options: ["tasyautsukyam", "tasyaautsukyam", "tasyāoutsukyam"], answer: 0, explanation: "-ā + au は au に融合する。したがって a) tasyautsukyam が正解。" },
-  { question: "nadī eva → ______", options: ["nadyeva", "nadīeva", "nadiveva"], answer: 0, explanation: "-ī + 母音 は y に半母音化。したがって a) nadyeva が正解。" },
-  { question: "madhu iva → ______", options: ["madhviva", "madhuiva", "madhūiva"], answer: 0, explanation: "-ū + 母音 は v に半母音化。したがって a) madhviva が正解。" },
-  { question: "kartṛ asti → ______", options: ["kartr asti", "kartṛasti", "kartra asti"], answer: 0, explanation: "-ṛ + 母音 は r に半母音化。したがって a) kartr asti が正解。" },
-  { question: "te api → ______", options: ["teʼpi", "tepi", "te api"], answer: 0, explanation: "-e + a は a 脱落しアヴァグラハ（ʼ）で表記。したがって a) teʼpi が正解。" },
-  { question: "prabho atra → ______", options: ["prabhoʼtra", "prabhoatra", "prabhātra"], answer: 0, explanation: "-o + a は a 脱落しアヴァグラハ。したがって a) prabhoʼtra が正解。" },
-  { question: "tau ubhau api → ______", options: ["tāv ubhāv api", "tau ubhauapi", "tāubhāv api"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv は語形変化、2) ubhau + api は au + a の母音サンディで āv になります。したがって a) tāv ubhāv api が正解。" }
+{ question: "na asti (न असति) → ______", options: ["naasti (नास्ति)", "nāsti (नास्ति)", "nāāsti (नाआस्ति)"], answer: 1, explanation: "-a (अ) + a (अ) は ā (आ) に融合する。したがって b) nāsti (नास्ति) が正解。" }
+{ question: "sā api (सा अपि) → ______", options: ["sāpi (सापि)", "sāāpi (साआपि)", "saapi (सापि)"], answer: 0, explanation: "-ā (आ) + a (अ) は ā (आ) に融合する。したがって a) sāpi (सापि) が正解。" }
+{ question: "asti iha (अस्ति इह) → ______", options: ["astīha (अस्तीह)", "astiha (अस्तिह)", "astiīha (अस्तीीह)"], answer: 0, explanation: "-i (इ) + ī (ई) は ī (ई) に融合。したがって a) astīha (अस्तीह) が正解。" }
+{ question: "sādhu uktam (साधु उक्तम्) → ______", options: ["sādhuuktam (साधुउक्तम्)", "sādhūktam (साधूक्तम्)", "sādhvuktam (साध्वुक्तम्)"], answer: 1, explanation: "-u (उ) + u (उ) は ū (ऊ) に融合する。したがって b) sādhūktam (साधूक्तम्) が正解。" }
+{ question: "kartṛ ṛju (कर्तृ ऋजु) → ______", options: ["kartr̥ju (कर्तृजु)", "kartṛṛju (कर्तृऋजु)", "kartṝju (कर्तॄजु)"], answer: 2, explanation: "-ṛ (ऋ) + ṛ (ऋ) は ṝ (ॠ) に融合。したがって c) kartṝju (कर्तॄजु) が正解。" }
+{ question: "tava icchā (तव इच्छा) → ______", options: ["tavecchā (तवेच्छा)", "tavaicchā (तवैच्छा)", "tavicchā (तविच्छा)"], answer: 0, explanation: "-a (अ) + i (इ) は e (ए) に融合する。したがって a) tavecchā (तवेच्छा) が正解。" }
+{ question: "sā uktvā (सा उक्त्वा) → ______", options: ["soktvā (सोक्त्वा)", "sāuktvā (साउक्त्वा)", "sāoktvā (साऑक्त्वा)"], answer: 0, explanation: "-ā (आ) + u (उ) は o (ओ) に融合する。したがって a) soktvā (सोक्त्वा) が正解。" }
+{ question: "yathā ṛtu (यथा ऋतु) → ______", options: ["yathartu (यथर्तु)", "yathārṭu (यथार्टु)", "yatharitu (यथरितु)"], answer: 0, explanation: "-ā (आ) + ṛ (ऋ) は ar (अर्ज्ञ) に融合する。したがって a) yathartu (यथर्तु) が正解。" }
+{ question: "tava eva (तव एव) → ______", options: ["tavaiva (तवैव)", "taveva (तवेव)", "tavāeva (तवाऽएव)"], answer: 0, explanation: "-a (अ) + e (ए) は ai (ऐ) に融合する。したがって a) tavaiva (तवैव) が正解。" }
+{ question: "tava aiśvaryam (तव ऐश्वर्यम्) → ______", options: ["tavaaiśvaryam (तवऐश्वर्यम्)", "tavaiśvaryam (तवैश्वर्यम्)", "tavāiśvaryam (तवाऐश्वर्यम्)"], answer: 1, explanation: "-ā (आ) + ai (ऐ) は ai (ऐ) に保持される。したがって b) tavaiśvaryam (तवैश्वर्यम्) が正解。" }
+{ question: "sā oṣadhiḥ (सा ओषधिः) → ______", options: ["sauṣadhiḥ (सौषधिः)", "sāoṣadhiḥ (साओषधिः)", "sa oṣadhiḥ (स ओषधिः)"], answer: 0, explanation: "-ā (आ) + o (ओ) は au (औ) に融合する。したがって a) sauṣadhiḥ (सौषधिः) が正解。" }
+{ question: "tasya autsukyam (तस्य औत्सुक्यम्) → ______", options: ["tasyautsukyam (तस्यौत्सुक्यम्)", "tasyaautsukyam (तस्यऔत्सुक्यम्)", "tasyāoutsukyam (तस्याौत्सुक्यम्)"], answer: 0, explanation: "-ā (आ) + au (औ) は au (औ) に融合する。したがって a) tasyautsukyam (तस्यौत्सुक्यम्) が正解。" }
+{ question: "nadī eva (नदी एव) → ______", options: ["nadyeva (नद्येव)", "nadīeva (नदीएव)", "nadiveva (नदिवेव)"], answer: 0, explanation: "-ī (ई) + 母音 は y (य) に半母音化。したがって a) nadyeva (नद्येव) が正解。" }
+{ question: "madhu iva (मधु इव) → ______", options: ["madhviva (मध्विव)", "madhuiva (मधुइव)", "madhūiva (मधूइव)"], answer: 0, explanation: "-ū (ऊ) + 母音 は v (व) に半母音化。したがって a) madhviva (मध्विव) が正解。" }
+{ question: "kartṛ asti (कर्तृ अस्ति) → ______", options: ["kartr asti (कर्त्र अस्ति)", "kartṛasti (कर्तृअस्ति)", "kartra asti (कर्त्रअस्ति)"], answer: 0, explanation: "-ṛ (ऋ) + 母音 は r (र्) に半母音化。したがって a) kartr asti (कर्त्र अस्ति) が正解。" }
+{ question: "te api (ते अपि) → ______", options: ["teʼpi (तेऽपि)", "tepi (तेपि)", "te api (ते अपि)"], answer: 0, explanation: "-e (ए) + a (अ) は a 脱落しアヴァグラハ（ʼ／ऽ）で表記。したがって a) teʼpi (तेऽपि) が正解。" }
+{ question: "prabho atra (प्रभो अत्र) → ______", options: ["prabhoʼtra (प्रभोऽत्र)", "prabhoatra (प्रभोअत्र)", "prabhātra (प्रभात्र)"], answer: 0, explanation: "-o (ओ) + a (अ) は a 脱落しアヴァグラハ（ʼ／ऽ）で表記。したがって a) prabhoʼtra (प्रभोऽत्र) が正解。" }
+{ question: "tau ubhau api (तौ उभौ अपि) → ______", options: ["tāv ubhāv api (ताव उभाव् अपि)", "tau ubhauapi (तौ उभौअपि)", "tāubhāv api (तौभाव् अपि)"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv（語形変化）, 2) ubhau + api は au (औ) + a (अ) の母音サンディで āv (आव्) になります。したがって a) tāv ubhāv api (ताव उभाव् अपि) が正解。" }
     ]);
 
     function showQuestion() {
