@@ -80,9 +80,24 @@
     .next-btn:hover {
       background-color: #1e88e5;
     }
+    .retry-btn {
+      display: none;
+      margin: 20px auto 10px;
+      background-color: #66bb6a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 28px;
+      text-align: center;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    .retry-btn:hover {
+      background-color: #43a047;
+    }
     .back-to-menu {
       text-align: center;
-      margin-top: 40px;
+      margin-top: 20px;
     }
     .back-to-menu button {
       background-color: #9e9e9e;
@@ -96,12 +111,22 @@
     .back-to-menu button:hover {
       background-color: #757575;
     }
+    .result {
+      text-align: center;
+      font-size: 1.6em;
+      font-weight: bold;
+      margin-top: 30px;
+    }
+    .green { color: #2e7d32; }
+    .yellow { color: #fbc02d; }
+    .red { color: #e53935; }
   </style>
 </head>
 <body>
   <h1>母音サンディクイズ</h1>
   <div id="quiz"></div>
   <button class="next-btn" onclick="showNextQuestion()">次へ</button>
+  <button class="retry-btn" onclick="retryIncorrectQuestions()">間違った問題に挑戦</button>
   <div class="back-to-menu">
     <button onclick="location.href='index.html'">メニューに戻る</button>
   </div>
@@ -109,17 +134,18 @@
     const quizEl = document.getElementById('quiz');
     let index = 0;
     let correctCount = 0;
+    let incorrectQuestions = [];
     const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
-    const questions = shuffle([
+    const questions = [
   { question: "na asti (न असति) → ______", options: ["naasti (नास्ति)", "nāsti (नास्ति)", "nāāsti (नाआस्ति)"], answer: 1, explanation: "-a (अ) + a (अ) は ā (आ) に融合する。したがって b) nāsti (नास्ति) が正解。" },
   { question: "sā api (सा अपि) → ______", options: ["sāpi (सापि)", "sāāpi (साआपि)", "saapi (सापि)"], answer: 0, explanation: "-ā (आ) + a (अ) は ā (आ) に融合する。したがって a) sāpi (सापि) が正解。" },
   { question: "asti iha (अस्ति इह) → ______", options: ["astīha (अस्तीह)", "astiha (अस्तिह)", "astiīha (अस्तीीह)"], answer: 0, explanation: "-i (इ) + ī (ई) は ī (ई) に融合。したがって a) astīha (अस्तीह) が正解。" },
   { question: "sādhu uktam (साधु उक्तम्) → ______", options: ["sādhuuktam (साधुउक्तम्)", "sādhūktam (साधूक्तम्)", "sādhvuktam (साध्वुक्तम्)"], answer: 1, explanation: "-u (उ) + u (उ) は ū (ऊ) に融合する。したがって b) sādhūktam (साधूक्तम्) が正解。" },
   { question: "kartṛ ṛju (कर्तृ ऋजु) → ______", options: ["kartr̥ju (कर्तृजु)", "kartṛṛju (कर्तृऋजु)", "kartṝju (कर्तॄजु)"], answer: 2, explanation: "-ṛ (ऋ) + ṛ (ऋ) は ṝ (ॠ) に融合。したがって c) kartṝju (कर्तॄजु) が正解。" },
-  { question: "tava icchā (तव इच्छा) → ______", options: ["tavecchā (तवेच्छा)", "tavaicchā (तवैच्छा)", "tavicchā (तविच्छा)"], answer: 0, explanation: "-a (अ) + i (इ) は e (ए) に融合する。したがって a) tavecchā (तवेच्छा) が正解。" },
+  { question: "tava icchā (तव इच्छा) → ______", options: ["tavecchā (तवेच्छा)", "tavaicchā (तवैच्छा)", "tavicchā (तविच्छा)"], answer: 0, explanation: "-a (अ) + i (इ) は e (ए) に融合する。したがって a) tavecchā (तवेッチा) が正解。" },
   { question: "sā uktvā (सा उक्त्वा) → ______", options: ["soktvā (सोक्त्वा)", "sāuktvā (साउक्त्वा)", "sāoktvā (साऑक्त्वा)"], answer: 0, explanation: "-ā (आ) + u (उ) は o (ओ) に融合する。したがって a) soktvā (सोक्त्वा) が正解。" },
-  { question: "yathā ṛtu (यथा ऋतु) → ______", options: ["yathartu (यथर्तु)", "yathārṭu (यथार्टु)", "yatharitu (यथरितु)"], answer: 0, explanation: "-ā (आ) + ṛ (ऋ) は ar (अर्ज्ञ) に融合する。したがって a) yathartu (यथर्तु) が正解。" },
+  { question: "yathā ṛtu (यथा ऋतु) → ______", options: ["yathartu (यथर्तु)", "yathārṭu (यथार्टु)", "yatharitu (यथरितु)"], answer: 0, explanation: "-ā (आ) + ṛ (ऋ) は ar (अर्) に融合する。したがって a) yathartu (यथर्तु) が正解。" },
   { question: "tava eva (तव एव) → ______", options: ["tavaiva (तवैव)", "taveva (तवेव)", "tavāeva (तवाऽएव)"], answer: 0, explanation: "-a (अ) + e (ए) は ai (ऐ) に融合する。したがって a) tavaiva (तवैव) が正解。" },
   { question: "tava aiśvaryam (तव ऐश्वर्यम्) → ______", options: ["tavaaiśvaryam (तवऐश्वर्यम्)", "tavaiśvaryam (तवैश्वर्यम्)", "tavāiśvaryam (तवाऐश्वर्यम्)"], answer: 1, explanation: "-ā (आ) + ai (ऐ) は ai (ऐ) に保持される。したがって b) tavaiśvaryam (तवैश्वर्यम्) が正解。" },
   { question: "sā oṣadhiḥ (सा ओषधिः) → ______", options: ["sauṣadhiḥ (सौषधिः)", "sāoṣadhiḥ (साओषधिः)", "sa oṣadhiḥ (स ओषधिः)"], answer: 0, explanation: "-ā (आ) + o (ओ) は au (औ) に融合する。したがって a) sauṣadhiḥ (सौषधिः) が正解。" },
@@ -130,7 +156,10 @@
   { question: "te api (ते अपि) → ______", options: ["teʼpi (तेऽपि)", "tepi (तेपि)", "te api (ते अपि)"], answer: 0, explanation: "-e (ए) + a (अ) は a 脱落しアヴァグラハ（ʼ／ऽ）で表記。したがって a) teʼpi (तेऽपि) が正解。" },
   { question: "prabho atra (प्रभो अत्र) → ______", options: ["prabhoʼtra (प्रभोऽत्र)", "prabhoatra (प्रभोअत्र)", "prabhātra (प्रभात्र)"], answer: 0, explanation: "-o (ओ) + a (अ) は a 脱落しアヴァグラハ（ʼ／ऽ）で表記。したがって a) prabhoʼtra (प्रभोऽत्र) が正解。" },
   { question: "tau ubhau api (तौ उभौ अपि) → ______", options: ["tāv ubhāv api (ताव उभाव् अपि)", "tau ubhauapi (तौ उभौअपि)", "tāubhāv api (तौभाव् अपि)"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv（語形変化）, 2) ubhau + api は au (औ) + a (अ) の母音サンディで āv (आव्) になります。したがって a) tāv ubhāv api (ताव उभाव् अपि) が正解。" }
-    ]);
+];
+
+const allQuestions = shuffle([...questions]);
+    let questions = [...allQuestions];
 
     function showQuestion() {
       quizEl.innerHTML = '';
@@ -149,6 +178,7 @@
         correctCount++;
       } else {
         button.classList.add("incorrect");
+        incorrectQuestions.push(questions[index]);
         buttons.forEach(b => {
           if (b.textContent.includes(correct)) b.classList.add("correct");
         });
@@ -162,9 +192,28 @@
         index++;
         showQuestion();
       } else {
-        quizEl.innerHTML = `<div class='result green'>お疲れさまです。 ${questions.length}問中、${correctCount}問正解です！</div>`;
+        let scoreClass = 'green';
+        const rate = correctCount / questions.length;
+        if (rate < 0.34) scoreClass = 'red';
+        else if (rate < 0.67) scoreClass = 'yellow';
+
+        quizEl.innerHTML = `<div class='result ${scoreClass}'>全問終了！ ${questions.length}問中、${correctCount}問正解です！</div>`;
         document.querySelector(".next-btn").style.display = "none";
+        if (incorrectQuestions.length > 0) {
+          document.querySelector(".retry-btn").style.display = "block";
+        }
       }
+    }
+
+    function retryIncorrectQuestions() {
+      if (incorrectQuestions.length === 0) return;
+      questions = shuffle([...incorrectQuestions]);
+      incorrectQuestions = [];
+      index = 0;
+      correctCount = 0;
+      document.querySelector(".retry-btn").style.display = "none";
+      document.querySelector(".next-btn").style.display = "block";
+      showQuestion();
     }
 
     showQuestion();
