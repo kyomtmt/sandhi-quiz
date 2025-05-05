@@ -286,7 +286,7 @@
       const backBtn = document.createElement("button");
       backBtn.innerText = "メニューに戻る";
       backBtn.style = "background:#888;color:white;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
-      backBtn.onclick = () => location.reload();
+      backBtn.onclick = () => window.location.href = 'index.html'; // <<< 修正箇所
       quizDiv.appendChild(backBtn);
     }
   }

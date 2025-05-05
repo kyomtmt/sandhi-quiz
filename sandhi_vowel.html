@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>母音サンディクイズ (外連声)</title>
+  <title>母音サンディクイズ (外連声)</title> 
   <style>
     body {
       font-family: sans-serif;
@@ -58,7 +58,7 @@
 </head>
 <body>
 <div id="quiz-container">
-  <h1 style="color:#1e88e5;">母音サンディクイズ (IAST)</h1>
+  <h1 style="color:#1e88e5;">母音サンディクイズ (外連声)</h1> 
   <div id="quiz"></div>
   <button class="next-btn" onclick="nextQuestion()" style="display:none;">次へ</button>
 </div>
@@ -207,7 +207,7 @@
       const backBtn = document.createElement("button");
       backBtn.innerText = "メニューに戻る";
       backBtn.style = "background:#888;color:white;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
-      backBtn.onclick = () => location.reload();
+      backBtn.onclick = () => window.location.href = 'index.html'; // <<< 修正箇所
       quizDiv.appendChild(backBtn);
     }
   }
