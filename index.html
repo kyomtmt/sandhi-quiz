@@ -7,43 +7,79 @@
   <style>
     body {
       font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
-      padding: 40px;
+      padding: 30px; /* 少し狭く */
       background: #f8f9fa;
       text-align: center;
     }
     h1 {
       color: #1e88e5;
-      font-size: 2.4em;
-      margin-bottom: 30px;
+      font-size: 2.2em; /* 少し小さく */
+      margin-bottom: 25px;
+    }
+    h2 { /* セクション見出し */
+      color: #455a64;
+      font-size: 1.7em; /* 少し小さく */
+      margin-top: 35px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #90a4ae;
+      display: inline-block;
+      padding-bottom: 4px;
     }
     ul {
       list-style: none;
       padding: 0;
+      margin-bottom: 25px; /* マージン調整 */
     }
     li {
-      margin: 15px 0;
+      margin: 12px 0; /* 少し詰める */
     }
     a {
       text-decoration: none;
-      font-size: 1.4em;
+      font-size: 1.2em; /* 少し小さく */
       color: white;
       background-color: #42a5f5;
-      padding: 12px 24px;
+      padding: 10px 20px; /* 少し小さく */
       border-radius: 8px;
       transition: background-color 0.3s ease;
       display: inline-block;
+      min-width: 160px; /* ボタン幅調整 */
     }
     a:hover {
       background-color: #1e88e5;
+    }
+    /* 無効化されたリンクのスタイル */
+    a.disabled {
+      background-color: #bdbdbd; /* グレー */
+      pointer-events: none; /* クリック不可 */
+      cursor: default;
+    }
+    .note { /* 注釈用 */
+        color: #757575;
+        font-size: 0.9em;
     }
   </style>
 </head>
 <body>
   <h1>サンディクイズ</h1>
-  <p>ジャンルを選んでください：</p>
-  <ul>
-    <li><a href="sandhi_vowel.html">母音サンディ</a></li>
-    <li><a href="sandhi_consonant.html">子音サンディ</a></li>
-  </ul>
+  <p>挑戦したい連声（サンディ）の種類を選んでください</p>
+
+  <div>
+    <h2>外連声 (External Sandhi)</h2>
+    <ul>
+      <li><a href="sandhi_vowel.html">母音サンディ</a></li>
+      <li><a href="sandhi_consonant.html">子音サンディ</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>内連声 (Internal Sandhi)</h2>
+    <ul>
+      {/* 内連声のファイルができたら href を修正し、class="disabled" を削除 */}
+      <li><a href="#" class="disabled">母音サンディ</a></li>
+      <li><a href="#" class="disabled">子音サンディ</a></li>
+    </ul>
+    <p class="note">（内連声クイズは準備中です）</p>
+  </div>
+
 </body>
 </html>
