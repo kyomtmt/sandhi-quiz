@@ -2,220 +2,219 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>母音サンディクイズ</title>
+  <title>母音サンディクイズ (外連声)</title>
   <style>
     body {
-      font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      font-family: sans-serif;
+      text-align: center;
       background: #f8f9fa;
+      padding: 20px;
     }
-    h1 {
-      text-align: center;
-      color: #1e88e5;
-      margin-bottom: 30px;
-      font-size: 2.2em;
-      font-weight: bold;
-    }
-    .question {
-      font-size: 1.4em;
-      margin-bottom: 20px;
-      background-color: #ffffff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      border-left: 5px solid #2196f3;
-    }
-    .options {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    .options button {
-      cursor: pointer;
-      font-size: 1.2em;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      background: linear-gradient(to right, #64b5f6, #42a5f5);
-      color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .option-btn {
+      display: block;
       width: 80%;
-      max-width: 450px;
+      max-width: 500px;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 1.1em;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      /* IAST表示のため少し調整 */
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      line-height: 1.5;
     }
-    .options button:hover {
-      background: linear-gradient(to right, #42a5f5, #2196f3);
-      transform: scale(1.03);
-    }
-    .explanation {
-      background: #e3f2fd;
-      padding: 10px;
-      margin-top: 15px;
-      border-left: 4px solid #42a5f5;
-      border-radius: 4px;
-    }
-    .correct { background: #66bb6a !important; }
-    .incorrect { background: #ef5350 !important; }
-    .score {
-      margin-top: 10px;
-      font-size: 1em;
+    .option-btn:disabled {
+      opacity: 1;
+      background: #eeeeee;
       color: #333;
-      text-align: center;
+      cursor: default;
     }
     .next-btn {
-      display: block;
-      margin: 30px auto 0;
-      background-color: #42a5f5;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 14px 28px;
-      text-align: center;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-    .next-btn:hover {
-      background-color: #1e88e5;
-    }
-    .retry-btn {
-      display: none;
-      margin: 20px auto 10px;
-      background-color: #66bb6a;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 14px 28px;
-      text-align: center;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-    .retry-btn:hover {
-      background-color: #43a047;
-    }
-    .back-to-menu {
-      text-align: center;
       margin-top: 20px;
-    }
-    .back-to-menu button {
-      background-color: #9e9e9e;
+      font-size: 1.2em;
+      padding: 10px 20px;
+      background: #42a5f5;
       color: white;
-      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
+      border-radius: 6px;
       cursor: pointer;
     }
-    .back-to-menu button:hover {
-      background-color: #757575;
+    .explanation-box {
+      background: #e3f2fd;
+      padding: 10px;
+      margin: 20px auto;
+      max-width: 500px;
+      border-radius: 6px;
+      font-size: 1em;
+      text-align: left; /* 説明文は左寄せに */
     }
-    .result {
-      text-align: center;
-      font-size: 1.6em;
-      font-weight: bold;
-      margin-top: 30px;
+    /* IAST表示のため */
+    #quiz div {
+        font-family: 'Arial', 'Helvetica', sans-serif;
+        line-height: 1.5;
     }
-    .green { color: #2e7d32; }
-    .yellow { color: #fbc02d; }
-    .red { color: #e53935; }
   </style>
 </head>
 <body>
-  <h1>母音サンディクイズ</h1>
+<div id="quiz-container">
+  <h1 style="color:#1e88e5;">母音サンディクイズ (IAST)</h1>
   <div id="quiz"></div>
-  <button class="next-btn" onclick="showNextQuestion()">次へ</button>
-  <button class="retry-btn" onclick="retryIncorrectQuestions()">間違った問題に挑戦</button>
-  <div class="back-to-menu">
-    <button onclick="location.href='index.html'">メニューに戻る</button>
-  </div>
-  <script>
-    const quizEl = document.getElementById('quiz');
-    let index = 0;
-    let correctCount = 0;
-    let incorrectQuestions = [];
-    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+  <button class="next-btn" onclick="nextQuestion()" style="display:none;">次へ</button>
+</div>
+<script>
+  let quizData = [
+    // §11.1.a (a/ā + a/ā = ā)
+    { question: "na asti → ______", options: ["nāsti", "na asti", "nasti"], answer: 0, explanation: "ルール §11.1.a: -a + a- は ā に融合します。したがって nāsti が正解です。" },
+    { question: "sā api → ______", options: ["sāpi", "sa api", "sā api"], answer: 0, explanation: "ルール §11.1.a: -ā + a- は ā に融合します。したがって sāpi が正解です。" },
+    { question: "sā āste → ______", options: ["sāste", "sa āste", "sā āste"], answer: 0, explanation: "ルール §11.1.a: -ā + ā- は ā に融合します。したがって sāste が正解です。" },
 
-    const questions = [
-  { question: "na asti (न असति) → ______", options: ["naasti (नास्ति)", "nāsti (नास्ति)", "nāāsti (नाआस्ति)"], answer: 1, explanation: "-a (अ) + a (अ) は ā (आ) に融合する。したがって b) nāsti (नास्ति) が正解。" },
-  { question: "sā api (सा अपि) → ______", options: ["sāpi (सापि)", "sāāpi (साआपि)", "saapi (सापि)"], answer: 0, explanation: "-ā (आ) + a (अ) は ā (आ) に融合する。したがって a) sāpi (सापि) が正解。" },
-  { question: "asti iha (अस्ति इह) → ______", options: ["astīha (अस्तीह)", "astiha (अस्तिह)", "astiīha (अस्तीीह)"], answer: 0, explanation: "-i (इ) + ī (ई) は ī (ई) に融合。したがって a) astīha (अस्तीह) が正解。" },
-  { question: "sādhu uktam (साधु उक्तम्) → ______", options: ["sādhuuktam (साधुउक्तम्)", "sādhūktam (साधूक्तम्)", "sādhvuktam (साध्वुक्तम्)"], answer: 1, explanation: "-u (उ) + u (उ) は ū (ऊ) に融合する。したがって b) sādhūktam (साधूक्तम्) が正解。" },
-  { question: "kartṛ ṛju (कर्तृ ऋजु) → ______", options: ["kartr̥ju (कर्तृजु)", "kartṛṛju (कर्तृऋजु)", "kartṝju (कर्तॄजु)"], answer: 2, explanation: "-ṛ (ऋ) + ṛ (ऋ) は ṝ (ॠ) に融合。したがって c) kartṝju (कर्तॄजु) が正解。" },
-  { question: "tava icchā (तव इच्छा) → ______", options: ["tavecchā (तवेच्छा)", "tavaicchā (तवैच्छा)", "tavicchā (तविच्छा)"], answer: 0, explanation: "-a (अ) + i (इ) は e (ए) に融合する。したがって a) tavecchā (तवेッチा) が正解。" },
-  { question: "sā uktvā (सा उक्त्वा) → ______", options: ["soktvā (सोक्त्वा)", "sāuktvā (साउक्त्वा)", "sāoktvā (साऑक्त्वा)"], answer: 0, explanation: "-ā (आ) + u (उ) は o (ओ) に融合する。したがって a) soktvā (सोक्त्वा) が正解。" },
-  { question: "yathā ṛtu (यथा ऋतु) → ______", options: ["yathartu (यथर्तु)", "yathārṭu (यथार्टु)", "yatharitu (यथरितु)"], answer: 0, explanation: "-ā (आ) + ṛ (ऋ) は ar (अर्) に融合する。したがって a) yathartu (यथर्तु) が正解。" },
-  { question: "tava eva (तव एव) → ______", options: ["tavaiva (तवैव)", "taveva (तवेव)", "tavāeva (तवाऽएव)"], answer: 0, explanation: "-a (अ) + e (ए) は ai (ऐ) に融合する。したがって a) tavaiva (तवैव) が正解。" },
-  { question: "tava aiśvaryam (तव ऐश्वर्यम्) → ______", options: ["tavaaiśvaryam (तवऐश्वर्यम्)", "tavaiśvaryam (तवैश्वर्यम्)", "tavāiśvaryam (तवाऐश्वर्यम्)"], answer: 1, explanation: "-ā (आ) + ai (ऐ) は ai (ऐ) に保持される。したがって b) tavaiśvaryam (तवैश्वर्यम्) が正解。" },
-  { question: "sā oṣadhiḥ (सा ओषधिः) → ______", options: ["sauṣadhiḥ (सौषधिः)", "sāoṣadhiḥ (साओषधिः)", "sa oṣadhiḥ (स ओषधिः)"], answer: 0, explanation: "-ā (आ) + o (ओ) は au (औ) に融合する。したがって a) sauṣadhiḥ (सौषधिः) が正解。" },
-  { question: "tasya autsukyam (तस्य औत्सुक्यम्) → ______", options: ["tasyautsukyam (तस्यौत्सुक्यम्)", "tasyaautsukyam (तस्यऔत्सुक्यम्)", "tasyāoutsukyam (तस्याौत्सुक्यम्)"], answer: 0, explanation: "-ā (आ) + au (औ) は au (औ) に融合する。したがって a) tasyautsukyam (तस्यौत्सुक्यम्) が正解。" },
-  { question: "nadī eva (नदी एव) → ______", options: ["nadyeva (नद्येव)", "nadīeva (नदीएव)", "nadiveva (नदिवेव)"], answer: 0, explanation: "-ī (ई) + 母音 は y (य) に半母音化。したがって a) nadyeva (नद्येव) が正解。" },
-  { question: "madhu iva (मधु इव) → ______", options: ["madhviva (मध्विव)", "madhuiva (मधुइव)", "madhūiva (मधूइव)"], answer: 0, explanation: "-ū (ऊ) + 母音 は v (व) に半母音化。したがって a) madhviva (मध्विव) が正解。" },
-  { question: "kartṛ asti (कर्तृ अस्ति) → ______", options: ["kartr asti (कर्त्र अस्ति)", "kartṛasti (कर्तृअस्ति)", "kartra asti (कर्त्रअस्ति)"], answer: 0, explanation: "-ṛ (ऋ) + 母音 は r (र्) に半母音化。したがって a) kartr asti (कर्त्र अस्ति) が正解。" },
-  { question: "te api (ते अपि) → ______", options: ["teʼpi (तेऽपि)", "tepi (तेपि)", "te api (ते अपि)"], answer: 0, explanation: "-e (ए) + a (अ) は a 脱落しアヴァグラハ（ʼ／ऽ）で表記。したがって a) teʼpi (तेऽपि) が正解。" },
-  { question: "prabho atra (प्रभो अत्र) → ______", options: ["prabhoʼtra (प्रभोऽत्र)", "prabhoatra (प्रभोअत्र)", "prabhātra (प्रभात्र)"], answer: 0, explanation: "-o (ओ) + a (अ) は a 脱落しアヴァグラハ（ʼ／ऽ）で表記。したがって a) prabhoʼtra (प्रभोऽत्र) が正解。" },
-  { question: "tau ubhau api (तौ उभौ अपि) → ______", options: ["tāv ubhāv api (ताव उभाव् अपि)", "tau ubhauapi (तौ उभौअपि)", "tāubhāv api (तौभाव् अपि)"], answer: 0, explanation: "この変化は2段階あります：1) tau → tāv（語形変化）, 2) ubhau + api は au (औ) + a (अ) の母音サンディで āv (आव्) になります。したがって a) tāv ubhāv api (ताव उभाव् अपि) が正解。" }
-];
+    // §11.1.b (i/ī + i/ī = ī)
+    { question: "asti iha → ______", options: ["astīha", "asti iha", "asty iha"], answer: 0, explanation: "ルール §11.1.b: -i + i- は ī に融合します。したがって astīha が正解です。" },
+    { question: "devī iva → ______", options: ["devīva", "devi iva", "devy iva"], answer: 0, explanation: "ルール §11.1.b: -ī + i- は ī に融合します。したがって devīva が正解です。" },
 
-const allQuestions = shuffle([...questions]);
-    
-    function showQuestion() {
-      quizEl.innerHTML = '';
-      const q = questions[index];
-      const shuffledOptions = shuffle([...q.options]);
-      quizEl.innerHTML += `<div class='question'>Q${index + 1}: ${q.question}</div>`;
-      quizEl.innerHTML += `<div class='options'>${shuffledOptions.map((opt, i) => `<button onclick='selectAnswer(this, "${opt}", "${q.options[q.answer]}", ${i})'>${String.fromCharCode(97+i)}) ${opt}</button>`).join('')}</div>`;
-      quizEl.innerHTML += `<div class='score'>正解数: ${correctCount} / ${questions.length}</div>`;
+    // §11.1.c (u/ū + u/ū = ū)
+    { question: "sādhu uktam → ______", options: ["sādhūktam", "sādhu uktam", "sādhv uktam"], answer: 0, explanation: "ルール §11.1.c: -u + u- は ū に融合します。したがって sādhūktam が正解です。" },
+    { question: "sādhu ūcuḥ → ______", options: ["sādhūcuḥ", "sādhu ūcuḥ", "sādhv ūcuḥ"], answer: 0, explanation: "ルール §11.1.c: -u + ū- は ū に融合します。したがって sādhūcuḥ が正解です。" },
+
+    // §11.1.d (ṛ + ṛ = ṝ)
+    { question: "kartṛ ṛju → ______", options: ["kartṝju", "kartṛ ṛju", "kartr ṛju"], answer: 0, explanation: "ルール §11.1.d: -ṛ + ṛ- は ṝ に融合します。したがって kartṝju が正解です。" },
+
+    // §11.2.a (a/ā + i/ī = e) - Guṇa
+    { question: "tava icchā → ______", options: ["tavecchā", "tava icchā", "tavicchā"], answer: 0, explanation: "ルール §11.2.a (グナ): -a + i- は e に融合します。したがって tavecchā が正解です。" },
+    { question: "loka īśvaraḥ → ______", options: ["lokeśvaraḥ", "loka īśvaraḥ", "lokaiśvaraḥ"], answer: 0, explanation: "ルール §11.2.a (グナ): -a + ī- は e に融合します。したがって lokeśvaraḥ が正解です。" },
+
+    // §11.2.b (a/ā + u/ū = o) - Guṇa
+    { question: "sā uktvā → ______", options: ["soktvā", "sā uktvā", "sauktvā"], answer: 0, explanation: "ルール §11.2.b (グナ): -ā + u- は o に融合します。したがって soktvā が正解です。" },
+    { question: "tadā ūcuḥ → ______", options: ["tadocuḥ", "tadā ūcuḥ", "tadaucuḥ"], answer: 0, explanation: "ルール §11.2.b (グナ): -ā + ū- は o に融合します。したがって tadocuḥ が正解です。" },
+
+    // §11.2.c (a/ā + ṛ = ar) - Guṇa
+    { question: "yathā ṛtu → ______", options: ["yathartu", "yathā ṛtu", "yathārṛtu"], answer: 0, explanation: "ルール §11.2.c (グナ): -ā + ṛ- は ar に融合します。したがって yathartu が正解です。" },
+
+    // §11.3.a (a/ā + e = ai) - Vṛddhi
+    { question: "tava eva → ______", options: ["tavaiva", "tava eva", "taveva"], answer: 0, explanation: "ルール §11.3.a (ヴリッディ): -a + e- は ai に融合します。したがって tavaiva が正解です。" },
+
+    // §11.3.b (a/ā + ai = ai) - Vṛddhi
+    { question: "tava aiśvaryam → ______", options: ["tavaiśvaryam", "tava aiśvaryam", "tavāśvaryam"], answer: 0, explanation: "ルール §11.3.b (ヴリッディ): -a + ai- は ai に融合します。したがって tavaiśvaryam が正解です。" },
+
+    // §11.3.c (a/ā + o = au) - Vṛddhi
+    { question: "sā oṣadhiḥ → ______", options: ["sauṣadhiḥ", "sā oṣadhiḥ", "soṣadhiḥ"], answer: 0, explanation: "ルール §11.3.c (ヴリッディ): -ā + o- は au に融合します。したがって sauṣadhiḥ が正解です。" },
+
+    // §11.3.d (a/ā + au = au) - Vṛddhi
+    { question: "tasya autsukyam → ______", options: ["tasyautsukyam", "tasya autsukyam", "tasyotsukyam"], answer: 0, explanation: "ルール §11.3.d (ヴリッディ): -a + au- は au に融合します。したがって tasyautsukyam が正解です。" },
+
+    // §11.4.a (i/ī + Vowel = y + Vowel)
+    { question: "iti arthaḥ → ______", options: ["ity arthaḥ", "iti arthaḥ", "itīrthaḥ"], answer: 0, explanation: "ルール §11.4.a: -i は後続の母音(a)の前で半母音 y に変化します。したがって ity arthaḥ が正解です。" },
+    { question: "nadī eva → ______", options: ["nady eva", "nadī eva", "nadeva"], answer: 0, explanation: "ルール §11.4.a: -ī は後続の母音(e)の前で半母音 y に変化します。したがって nady eva が正解です。" },
+
+    // §11.4.b (u/ū + Vowel = v + Vowel)
+    { question: "madhu iva → ______", options: ["madhv iva", "madhu iva", "madhū iva"], answer: 0, explanation: "ルール §11.4.b: -u は後続の母音(i)の前で半母音 v に変化します。したがって madhv iva が正解です。" },
+    { question: "astu etat → ______", options: ["astv etat", "astu etat", "astūtat"], answer: 0, explanation: "ルール §11.4.b: -u は後続の母音(e)の前で半母音 v に変化します。したがって astv etat が正解です。" },
+
+    // §11.4.c (ṛ + Vowel = r + Vowel)
+    { question: "kartṛ asti → ______", options: ["kartr asti", "kartṛ asti", "kartāsti"], answer: 0, explanation: "ルール §11.4.c: -ṛ は後続の母音(a)の前で半母音 r に変化します。したがって kartr asti が正解です。" },
+
+    // §11.5.a (e + a = e ')
+    { question: "te api → ______", options: ["te 'pi", "te api", "tay api"], answer: 0, explanation: "ルール §11.5.a: -e の後に a が続く場合、a は脱落し ' （アヴァグラハ）で示されます。したがって te 'pi が正解です。" },
+
+    // §11.5.b (o + a = o ')
+    { question: "prabho atra → ______", options: ["prabho 'tra", "prabho atra", "prabhav atra"], answer: 0, explanation: "ルール §11.5.b: -o の後に a が続く場合、a は脱落し ' （アヴァグラハ）で示されます。したがって prabho 'tra が正解です。" },
+
+    // §11.7.b (au + Vowel = āv + Vowel)
+    { question: "tau ubhau api → ______", options: ["tāv ubhāv api", "tau ubhau api", "tā ubhāv api"], answer: 0, explanation: "ルール §11.7.b: -au は後続の母音(u)の前で āv に変化します。したがって tāv ubhāv api が正解です。" }
+  ];
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+  }
 
-    function selectAnswer(button, selected, correct) {
-      const buttons = document.querySelectorAll(".options button");
-      buttons.forEach(b => b.disabled = true);
-      if (selected === correct) {
-        button.classList.add("correct");
-        correctCount++;
-      } else {
-        button.classList.add("incorrect");
-        incorrectQuestions.push(questions[index]);
-        buttons.forEach(b => {
-          if (b.textContent.includes(correct)) b.classList.add("correct");
-        });
-      }
-      const explanation = questions[index].explanation;
-      quizEl.innerHTML += `<div class='explanation'>${explanation}</div>`;
-    }
+  shuffle(quizData);
+  quizData.forEach(q => {
+    const correct = q.options[q.answer]; // Use 'answer' which is the index
+    shuffle(q.options);
+    q.correctIndex = q.options.indexOf(correct); // Find the new index after shuffle
+  });
 
-    function showNextQuestion() {
-      if (index < questions.length - 1) {
-        index++;
-        showQuestion();
-      } else {
-        let scoreClass = 'green';
-        const rate = correctCount / questions.length;
-        if (rate < 0.34) scoreClass = 'red';
-        else if (rate < 0.67) scoreClass = 'yellow';
+  let current = 0;
+  let correct = 0;
+  let wrongAnswers = [];
 
-        quizEl.innerHTML = `<div class='result ${scoreClass}'>全問終了！ ${questions.length}問中、${correctCount}問正解です！</div>`;
-        document.querySelector(".next-btn").style.display = "none";
-        if (incorrectQuestions.length > 0) {
-          document.querySelector(".retry-btn").style.display = "block";
+  function renderQuestion() {
+    const q = quizData[current];
+    const quiz = document.getElementById("quiz");
+    quiz.innerHTML = "<div style='font-size:1.2em;margin-bottom:10px;'>Q" + (current+1) + ": " + q.question + "</div>";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerHTML = opt;
+      btn.onclick = () => {
+        document.querySelectorAll(".option-btn").forEach(b => b.disabled = true);
+        if (i === q.correctIndex) {
+          btn.style.backgroundColor = "#66bb6a";
+          correct++;
+        } else {
+          btn.style.backgroundColor = "#ef5350";
+          wrongAnswers.push(q);
         }
+        const exp = document.createElement("div");
+        exp.className = "explanation-box";
+        exp.innerText = q.explanation;
+        quiz.appendChild(exp);
+        document.querySelector(".next-btn").style.display = "";
+      };
+      quiz.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    current++;
+    document.querySelector(".next-btn").style.display = "none";
+    if (current < quizData.length) {
+      renderQuestion();
+    } else {
+      // --- Quiz Finished ---
+      const rate = correct / quizData.length;
+      let color = rate >= 2/3 ? "green" : (rate >= 1/3 ? "orange" : "red");
+      let message = rate >= 2/3 ? "すばらしい！" : (rate >= 1/3 ? "あと一歩！" : "がんばろう！");
+
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = `
+        <div style='margin: 15px 0;'>
+          <h3 style='color:${color}; font-size: 2em;'>${message}</h3>
+          <p style='font-size: 1.3em;'>${quizData.length}問中、${correct}問正解です！</p>
+        </div>
+      `;
+
+      // --- Add Retry Button (if needed) ---
+      if (wrongAnswers.length > 0) {
+        const retry = document.createElement("button");
+        retry.innerText = "間違った問題に挑戦";
+        retry.style = "background:#ffb300;color:black;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
+        retry.onclick = () => {
+          quizData = wrongAnswers;
+          current = 0;
+          correct = 0;
+          wrongAnswers = [];
+          renderQuestion();
+        };
+        quizDiv.appendChild(retry);
       }
-    }
 
-    function retryIncorrectQuestions() {
-      if (incorrectQuestions.length === 0) return;
-      questions = shuffle([...incorrectQuestions]);
-      incorrectQuestions = [];
-      index = 0;
-      correctCount = 0;
-      document.querySelector(".retry-btn").style.display = "none";
-      document.querySelector(".next-btn").style.display = "block";
-      showQuestion();
+      // --- Add Back Button ---
+      const backBtn = document.createElement("button");
+      backBtn.innerText = "メニューに戻る";
+      backBtn.style = "background:#888;color:white;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
+      backBtn.onclick = () => location.reload();
+      quizDiv.appendChild(backBtn);
     }
+  }
 
-    showQuestion();
-  </script>
+  window.onload = () => {
+    renderQuestion();
+  };
+</script>
 </body>
 </html>

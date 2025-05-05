@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>子音サンディクイズ (外連声)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      padding: 20px;
+    }
+    .option-btn {
+      display: block;
+      width: 80%;
+      max-width: 500px;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 1.1em;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      /* IAST表示のため */
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      line-height: 1.5;
+    }
+    .option-btn:disabled {
+      opacity: 1;
+      background: #eeeeee;
+      color: #333;
+      cursor: default;
+    }
+    .next-btn {
+      margin-top: 20px;
+      font-size: 1.2em;
+      padding: 10px 20px;
+      background: #42a5f5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .explanation-box {
+      background: #e3f2fd;
+      padding: 10px;
+      margin: 20px auto;
+      max-width: 500px;
+      border-radius: 6px;
+      font-size: 1em;
+      text-align: left;
+    }
+    /* IAST表示のため */
+    #quiz div {
+        font-family: 'Arial', 'Helvetica', sans-serif;
+        line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div id="quiz-container">
+  <h1 style="color:#1e88e5;">子音サンディクイズ (外連声)</h1>
+  <div id="quiz"></div>
+  <button class="next-btn" onclick="nextQuestion()" style="display:none;">次へ</button>
+</div>
+<script>
+  // === 子音サンディデータ (修正版: 選択肢内の別形を除去) ===
+  let quizData = [
+    // §15.1.a (-k, -t, -p + voiced > -g, -d, -b)
+    { question: "dik + gajaḥ → ______", options: ["dikgajaḥ", "diggajaḥ", "dikhgajaḥ"], answer: 1, explanation: "ルール §15.1.a: 語末の -k は有声音 g の前で g に変化します。したがって diggajaḥ が正解です。" },
+    { question: "parivrāṭ + ayam → ______", options: ["parivrāt ayam", "parivrāḍ ayam", "parivrāṭ ayam"], answer: 1, explanation: "ルール §15.1.a: 語末の -ṭ は母音(有声音) a の前で ḍ に変化します。したがって parivrāḍ ayam が正解です。" },
+    { question: "kakup + dṛṣṭā → ______", options: ["kakub dṛṣṭā", "kakup dṛṣṭā", "kakud dṛṣṭā"], answer: 0, explanation: "ルール §15.1.a: 語末の -p は有声音 d の前で b に変化します。したがって kakub dṛṣṭā が正解です。" },
+
+    // §15.1.b (-k, -t, -p + nasal > voiced or nasal)
+    { question: "dik + nāgaḥ → ______", options: ["dignāgaḥ", "dikgnāgaḥ", "diknāgaḥ"], answer: 0, explanation: "ルール §15.1.b: 語末の -k は鼻音 n の前で g (dignāgaḥ) または ṅ (diṅnāgaḥ) に変化します。ここでは dignāgaḥ を正解とします。" }, // diṅnāgaḥ を選択肢から変更
+    { question: "ṣaṭ + māsaḥ → ______", options: ["ṣaḍmāsaḥ", "ṣaṭṇmāsaḥ", "ṣaṭmāsaḥ"], answer: 0, explanation: "ルール §15.1.b: 語末の -ṭ は鼻音 m の前で ḍ (ṣaḍmāsaḥ) または ṇ (ṣaṇmāsaḥ) に変化します。ここでは ṣaḍmāsaḥ を正解とします。" }, // ṣaṇmāsaḥ を選択肢から変更
+    { question: "kakup + na → ______", options: ["kakub na", "kakup na", "kakubp na"], answer: 0, explanation: "ルール §15.1.b: 語末の -p は鼻音 n の前で b (kakub na) または m (kakum na) に変化します。ここでは kakub na を正解とします。" }, // kakum na を選択肢から変更
+
+    // §15.2.a (-t + palatal/retroflex/l)
+    { question: "tat + ca → ______", options: ["tacca", "tatca", "tajca"], answer: 0, explanation: "ルール §15.2.a: 語末の -t は後続の c に同化し、tacca となります。" },
+    { question: "tat + jalam → ______", options: ["taj jalam", "tat jalam", "tajjalam"], answer: 0, explanation: "ルール §15.2.a: 語末の -t は後続の j に同化し、taj jalam となります。" },
+    { question: "tat + ṭaṅkam → ______", options: ["taṭ ṭaṅkam", "tat ṭaṅkam", "tattaṅkam"], answer: 0, explanation: "ルール §15.2.a: 語末の -t は後続の ṭ に同化し、taṭ ṭaṅkam となります。" },
+    { question: "ḍamat + ḍamara → ______", options: ["ḍamaḍḍamara", "ḍamatḍamara", "ḍamadḍamara"], answer: 0, explanation: "ルール §15.2.a: 語末の -t は後続の ḍ に同化し、ḍamaḍḍamara となります。" },
+    { question: "vidyut + latā → ______", options: ["vidyullatā", "vidyutlatā", "vidyudlatā"], answer: 0, explanation: "ルール §15.2.a: 語末の -t は後続の l に同化し、vidyullatā となります。" },
+
+    // §15.2.b (-t + ś)
+    { question: "tat + śrutvā → ______", options: ["tac chrutvā", "tatśrutvā", "taj śrutvā"], answer: 0, explanation: "ルール §15.2.b: 語末の -t は後続の ś と結合して cch に変化します。したがって tac chrutvā が正解です。" },
+
+    // §15.2.c (-t + others)
+    { question: "āsīt + rājā → ______", options: ["āsīd rājā", "āsīt rājā", "āsīr rājā"], answer: 0, explanation: "ルール §15.2.c (cf. §15.1.a): 語末の -t は有声音 r の前で d に変化します。したがって āsīd rājā が正解です。" },
+    { question: "tat + karoti → ______", options: ["tat karoti", "tak karoti", "tad karoti"], answer: 0, explanation: "ルール §15.2.c (cf. §15.1.a): 語末の -t は無声音 k の前では変化しません。したがって tat karoti が正解です。" },
+    { question: "tat + na → ______", options: ["tad na", "tadn na", "tat na"], answer: 0, explanation: "ルール §15.2.c (cf. §15.1.b): 語末の -t は鼻音 n の前で d (tad na) または n (tan na) に変化します。ここでは tad na を正解とします。" }, // tan na を選択肢から変更
+
+    // §15.3 (Doubling of nasals)
+    { question: "pratyaṅ + āste → ______", options: ["pratyaṅ āste", "pratyaṅṅ āste", "pratyañ āste"], answer: 1, explanation: "ルール §15.3: 短母音に続く語末の -ṅ は、後続の母音の前で -ṅṅ- と重複します。したがって pratyaṅṅ āste が正解です。" },
+    { question: "sugaṇ + iti → ______", options: ["sugaṇ iti", "sugaṇṇ iti", "sugaḍ iti"], answer: 1, explanation: "ルール §15.3: 短母音に続く語末の -ṇ は、後続の母音の前で -ṇṇ- と重複します。したがって sugaṇṇ iti が正解です。" },
+    { question: "tasmin + adrau → ______", options: ["tasminn adrau", "tasmin adrau", "tasmid adrau"], answer: 0, explanation: "ルール §15.3: 短母音に続く語末の -n は、後続の母音の前で -nn- と重複します。したがって tasminn adrau が正解です。" },
+
+    // §15.4.a (-n + j)
+    { question: "yān + jantūn → ______", options: ["yāñ jantūn", "yān jantūn", "yāj jantūn"], answer: 0, explanation: "ルール §15.4.a: 語末の -n は後続の j の前で ñ に変化します。したがって yāñ jantūn が正解です。" },
+
+    // §15.4.b (-n + ḍ)
+    { question: "mahān + ḍamaraḥ → ______", options: ["mahāṇ ḍamaraḥ", "mahān ḍamaraḥ", "mahāḍ ḍamaraḥ"], answer: 0, explanation: "ルール §15.4.b: 語末の -n は後続の ḍ の前で ṇ に変化します。したがって mahāṇ ḍamaraḥ が正解です。" },
+
+    // §15.4.c (-n + ś)
+    { question: "tān + śaśāpa → ______", options: ["tāñ śaśāpa", "tān śaśāpa", "tāc chaśāpa"], answer: 0, explanation: "ルール §15.4.c: 語末の -n は後続の ś の前で ñ に変化します。したがって tāñ śaśāpa が正解です。（ch に変化する別ルールもあります）" },
+
+    // §15.4.d (-n + l)
+    { question: "tān + lokān → ______", options: ["tān lokān", "tāl̐ lokān", "tā lokān"], answer: 1, explanation: "ルール §15.4.d: 語末の -n は後続の l の前で脱落し、l が鼻音化（l̐）します。したがって tāl̐ lokān が正解です。" },
+
+    // §15.4.e (-n + c/ch, ṭ/ṭh, t/th)
+    { question: "tān + ca → ______", options: ["tāṃś ca", "tān ca", "tāñ ca"], answer: 0, explanation: "ルール §15.4.e: -n + c の間に ś が挿入され、n は ṃ になります。したがって tāṃś ca が正解です。" },
+    { question: "pāśān + chettum → ______", options: ["pāśāṃś chettum", "pāśān chettum", "pāśāñ chettum"], answer: 0, explanation: "ルール §15.4.e: -n + ch の間に ś が挿入され、n は ṃ になります。したがって pāśāṃś chettum が正解です。" },
+    { question: "tān + ṭaṅkārān → ______", options: ["tāṃṣ ṭaṅkārān", "tān ṭaṅkārān", "tāṇ ṭaṅkārān"], answer: 0, explanation: "ルール §15.4.e: -n + ṭ の間に ṣ が挿入され、n は ṃ になります。したがって tāṃṣ ṭaṅkārān が正解です。" },
+    { question: "patan + taruḥ → ______", options: ["pataṃs taruḥ", "patan taruḥ", "pataṃ taruḥ"], answer: 0, explanation: "ルール §15.4.e: -n + t の間に s が挿入され、n は ṃ になります。したがって pataṃs taruḥ が正解です。" },
+
+    // §15.5.a (-m + sibilant/h/r)
+    { question: "tam + śatrum → ______", options: ["taṁ śatrum", "tan śatrum", "tam śatrum"], answer: 0, explanation: "ルール §15.5.a: 語末の -m は後続の子音 ś の前では ṁ（アヌスヴァーラ）になります。したがって taṁ śatrum が正解です。" },
+    { question: "tam + ṣaṇḍham → ______", options: ["taṁ ṣaṇḍham", "taṇ ṣaṇḍham", "tam ṣaṇḍham"], answer: 0, explanation: "ルール §15.5.a: 語末の -m は後続の子音 ṣ の前では ṁ（アヌスヴァーラ）になります。したがって taṁ ṣaṇḍham が正解です。" },
+    { question: "tam + sūnam → ______", options: ["taṁ sūnam", "tan sūnam", "tam sūnam"], answer: 0, explanation: "ルール §15.5.a: 語末の -m は後続の子音 s の前では ṁ（アヌスヴァーラ）になります。したがって taṁ sūnam が正解です。" },
+    { question: "madhuram + hasati → ______", options: ["madhuraṁ hasati", "madhuram hasati", "madhuran hasati"], answer: 0, explanation: "ルール §15.5.a: 語末の -m は後続の子音 h の前では ṁ（アヌスヴァーラ）になります。したがって madhuraṁ hasati が正解です。" },
+    { question: "tam + rakṣati → ______", options: ["taṁ rakṣati", "tan rakṣati", "tam rakṣati"], answer: 0, explanation: "ルール §15.5.a: 語末の -m は後続の子音 r の前では ṁ（アヌスヴァーラ）になります。したがって taṁ rakṣati が正解です。" },
+
+    // §15.5.b (-m + y/l/v)
+    { question: "grāmam + yāti → ______", options: ["grāmaṁ yāti", "grāmay yāti", "grām yāti"], answer: 0, explanation: "ルール §15.5.b: 語末の -m は後続の y の前では ṁ になるのが一般的です (grāmaṁ yāti)。鼻音化 y̐ を伴う grāmay̐ yāti もあります。ここでは grāmaṁ yāti を正解とします。" }, // grāmay̐ yāti を選択肢から変更
+    { question: "tam + lokam → ______", options: ["taṁ lokam", "tam̐ lokam", "tal lokam"], answer: 0, explanation: "ルール §15.5.b: 語末の -m は後続の l の前では ṁ になるのが一般的です (taṁ lokam)。鼻音化 l̐ を伴う taḷ̐ lokam もあります。ここでは taṁ lokam を正解とします。" }, // taḷ̐ lokam を選択肢から変更
+    { question: "tam + veda → ______", options: ["taṁ veda", "tam veda", "tav veda"], answer: 0, explanation: "ルール §15.5.b: 語末の -m は後続の v の前では ṁ になるのが一般的です (taṁ veda)。鼻音化 ṿ̐ を伴う taṿ̐ veda もあります。ここでは taṁ veda を正解とします。" }, // taṿ̐ veda を選択肢から変更
+
+    // §15.5.c (-m + stop/nasal)
+    { question: "kim + karoti → ______", options: ["kiṁ karoti", "kin karoti", "kim karoti"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の破裂音 k の前では ṁ になるのが一般的 (kiṁ karoti)。k と同器官の鼻音 ṅ になる kiṅ karoti もあります。ここでは kiṁ karoti を正解とします。" }, // kiṅ karoti を選択肢から変更
+    { question: "śatrum + jahi → ______", options: ["śatruṁ jahi", "śatrun jahi", "śatrum jahi"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の破裂音 j の前では ṁ になるのが一般的 (śatruṁ jahi)。j と同器官の鼻音 ñ になる śatruñ jahi もあります。ここでは śatruṁ jahi を正解とします。" }, // śatruñ jahi を選択肢から変更
+    { question: "idam + ṭaṅkam → ______", options: ["idaṁ ṭaṅkam", "idat ṭaṅkam", "idam ṭaṅkam"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の破裂音 ṭ の前では ṁ になるのが一般的 (idaṁ ṭaṅkam)。ṭ と同器官の鼻音 ṇ になる idaṇ ṭaṅkam もあります。ここでは idaṁ ṭaṅkam を正解とします。" }, // idaṇ ṭaṅkam を選択肢から変更
+    { question: "bhadram + te → ______", options: ["bhadraṁ te", "bhadrat te", "bhadram te"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の破裂音 t の前では ṁ になるのが一般的 (bhadraṁ te)。t と同器官の鼻音 n になる bhadran te もあります。ここでは bhadraṁ te を正解とします。" }, // bhadran te を選択肢から変更
+    { question: "aham + pibāmi → ______", options: ["ahaṁ pibāmi", "aha pibāmi", "ahamp pibāmi"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の破裂音 p の前では ṁ になるのが一般的 (ahaṁ pibāmi)。m のままの aham pibāmi もあります。ここでは ahaṁ pibāmi を正解とします。" }, // aham pibāmi を選択肢から変更
+    { question: "gurum + namati → ______", options: ["guruṁ namati", "gurul namati", "gurum namati"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の鼻音 n の前では ṁ になるのが一般的 (guruṁ namati)。n と同器官の鼻音 n になる gurun namati もあります。ここでは guruṁ namati を正解とします。" }, // gurun namati を選択肢から変更
+    { question: "vacanam + mama → ______", options: ["vacanaṁ mama", "vacan mama", "vacanan mama"], answer: 0, explanation: "ルール §15.5.c: 語末の -m は後続の鼻音 m の前では ṁ になるのが一般的 (vacanaṁ mama)。m のままの vacanam mama もあります。ここでは vacanaṁ mama を正解とします。" }, // vacanam mama を選択肢から変更
+
+    // §15.6.a (-ḥ + k/kh/p/ph)
+    { question: "punaḥ + karoti → ______", options: ["punaḥ karoti", "punas karoti", "punar karoti"], answer: 0, explanation: "ルール §15.6.a: 語末の -ḥ は後続の無声音 k の前では変化しません。したがって punaḥ karoti が正解です。" },
+    { question: "nadyāḥ + pāram → ______", options: ["nadyāḥ pāram", "nadyās pāram", "nadyā pāram"], answer: 0, explanation: "ルール §15.6.a: 語末の -ḥ は後続の無声音 p の前では変化しません。したがって nadyāḥ pāram が正解です。" },
+
+    // §15.6.b (-ḥ + c/ch)
+    { question: "pūrṇaḥ + candraḥ → ______", options: ["pūrṇaḥ candraḥ", "pūrṇas candraḥ", "pūrṇaś candraḥ"], answer: 2, explanation: "ルール §15.6.b: 語末の -ḥ は後続の無声音 c の前で ś に変化します。したがって pūrṇaś candraḥ が正解です。" },
+
+    // §15.6.c (-ḥ + ṭ/ṭh)
+    { question: "kuṭhāraiḥ + ṭaṅkaiḥ ca → ______", options: ["kuṭhāraiṣ ṭaṅkaiś ca", "kuṭhāraiḥ ṭaṅkaiḥ ca", "kuṭhārair ṭaṅkaiś ca"], answer: 0, explanation: "ルール §15.6.c & b: 語末の -ḥ は後続の無声音 ṭ の前で ṣ に、c の前で ś に変化します。したがって kuṭhāraiṣ ṭaṅkaiś ca が正解です。" },
+
+    // §15.6.d (-ḥ + t/th)
+    { question: "nadyāḥ + tīram → ______", options: ["nadyās tīram", "nadyāḥ tīram", "nadyā tīram"], answer: 0, explanation: "ルール §15.6.d: 語末の -ḥ は後続の無声音 t の前で s に変化します。したがって nadyās tīram が正解です。" },
+
+    // §15.6.e (-ḥ + ś/ṣ/s)
+    { question: "suptaḥ + śiśuḥ → ______", options: ["suptaḥ śiśuḥ", "suptaśiśuḥ", "suptas śiśuḥ"], answer: 0, explanation: "ルール §15.6.e: 語末の -ḥ は後続の ś の前で変化しない (suptaḥ śiśuḥ) のが一般的ですが、ś に同化する (suptaś śiśuḥ) こともあります。ここでは suptaḥ śiśuḥ を正解とします。" }, // suptaś śiśuḥ を選択肢から変更
+    { question: "rāmāḥ + ṣaṭ → ______", options: ["rāmāḥ ṣaṭ", "rāmāṣaṭ", "rāmās ṣaṭ"], answer: 0, explanation: "ルール §15.6.e: 語末の -ḥ は後続の ṣ の前で変化しない (rāmāḥ ṣaṭ) のが一般的ですが、ṣ に同化する (rāmāṣ ṣaṭ) こともあります。ここでは rāmāḥ ṣaṭ を正解とします。" }, // rāmāṣ ṣaṭ を選択肢から変更
+    { question: "prathamaḥ + sargaḥ → ______", options: ["prathamaḥ sargaḥ", "prathamsargaḥ", "prathamo sargaḥ"], answer: 0, explanation: "ルール §15.6.e: 語末の -ḥ は後続の s の前で変化しない (prathamaḥ sargaḥ) のが一般的ですが、s に同化する (prathamas sargaḥ) こともあります。ここでは prathamaḥ sargaḥ を正解とします。" }, // prathamas sargaḥ を選択肢から変更
+
+    // §15.7.a (-ḥ preceded by i/u etc. + voiced)
+    { question: "kaviḥ + ayam → ______", options: ["kavir ayam", "kavi ayam", "kaviḥ ayam"], answer: 0, explanation: "ルール §15.7.a: -i に続く -ḥ は、後続の有声音 a の前で r に変化します。したがって kavir ayam が正解です。" },
+    { question: "gauḥ + gacchati → ______", options: ["gaur gacchati", "gauḥ gacchati", "gaus gacchati"], answer: 0, explanation: "ルール §15.7.a: -au に続く -ḥ は、後続の有声音 g の前で r に変化します。したがって gaur gacchati が正解です。" },
+
+    // §15.7.b (-ḥ from r + r)
+    { question: "raviḥ + rūḍhaḥ → ______", options: ["ravī rūḍhaḥ", "ravir rūḍhaḥ", "raviḥ rūḍhaḥ"], answer: 0, explanation: "ルール §15.7.b: -ḥ が元の r であり、後続が r の場合、-ḥ は脱落し、前の短母音 i が長音化して ī になります。したがって ravī rūḍhaḥ が正解です。" },
+
+    // §15.7.備考 (bhoḥ + voiced/unvoiced)
+    { question: "bhoḥ + devāḥ → ______", options: ["bho devāḥ", "bhoḥ devāḥ", "bhor devāḥ"], answer: 0, explanation: "ルール §15.7.備考: 間投詞 bhoḥ は、後続の有声音 d の前で -ḥ を脱落させます。したがって bho devāḥ が正解です。" },
+    { question: "bhoḥ + chettaḥ → ______", options: ["bhoś chettaḥ", "bhoḥ chettaḥ", "bhos chettaḥ"], answer: 0, explanation: "ルール §15.7.備考: 間投詞 bhoḥ は、後続の無声音 ch の前で -ḥ が ś に変化します。したがって bhoś chettaḥ が正解です。" },
+
+    // §15.8.a (-aḥ + Vowel (not a))
+    { question: "kaḥ + eṣaḥ → ______", options: ["ka eṣaḥ", "kaḥ eṣaḥ", "ko eṣaḥ"], answer: 0, explanation: "ルール §15.8.a: -aḥ は後続の母音 e (a以外)の前で -ḥ を脱落させます。したがって ka eṣaḥ が正解です。" },
+
+    // §15.8.b (-aḥ + a)
+    { question: "naraḥ + ayam → ______", options: ["naro 'yam", "naraḥ ayam", "narā ayam"], answer: 0, explanation: "ルール §15.8.b: -aḥ は後続の a の前で o となり、a は脱落して ' で示されます。したがって naro 'yam が正解です。" },
+
+    // §15.8.c (-aḥ + voiced consonant)
+    { question: "rāmaḥ + gacchati → ______", options: ["rāmo gacchati", "rāmaḥ gacchati", "rāmas gacchati"], answer: 0, explanation: "ルール §15.8.c: -aḥ は後続の有声音 g の前で o に変化します。したがって rāmo gacchati が正解です。" },
+
+    // §15.8.備考 (saḥ/eṣaḥ)
+    { question: "saḥ + abravīt → ______", options: ["so 'bravīt", "saḥ abravīt", "sa abravīt"], answer: 0, explanation: "ルール §15.8.備考: 代名詞 saḥ は後続の a の前で so となり、a は脱落して ' で示されます。したがって so 'bravīt が正解です。" },
+    { question: "eṣaḥ + asti → ______", options: ["eṣo 'sti", "eṣaḥ asti", "eṣa asti"], answer: 0, explanation: "ルール §15.8.備考: 代名詞 eṣaḥ は後続の a の前で eṣo となり、a は脱落して ' で示されます。したがって eṣo 'sti が正解です。" },
+    { question: "saḥ + indraḥ → ______", options: ["sa indraḥ", "saḥ indraḥ", "so indraḥ"], answer: 0, explanation: "ルール §15.8.備考: 代名詞 saḥ は後続の母音 i (a以外)の前で -ḥ を脱落させます。したがって sa indraḥ が正解です。" },
+
+    // §15.8.d (-āḥ + voiced)
+    { question: "devāḥ + ūcuḥ → ______", options: ["devā ūcuḥ", "devāḥ ūcuḥ", "devār ūcuḥ"], answer: 0, explanation: "ルール §15.8.d: -āḥ は後続の有声音 ū の前で -ḥ を脱落させます。したがって devā ūcuḥ が正解です。" },
+
+    // §15.8.e (-aḥ/-āḥ from r + voiced)
+    { question: "punaḥ + gacchati → ______", options: ["punar gacchati", "punaḥ gacchati", "puno gacchati"], answer: 0, explanation: "ルール §15.8.e: 語源的に r である punaḥ の -ḥ は、後続の有声音 g の前で r に戻ります。したがって punar gacchati が正解です。" },
+    { question: "punaḥ + ramate → ______", options: ["punā ramate", "punaḥ ramate", "punar ramate"], answer: 0, explanation: "ルール §15.8.e: 語源的に r である punaḥ の -ḥ は、後続が r の場合、-ḥ は脱落し、前の短母音 a が ā に長音化します。したがって punā ramate が正解です。" },
+    { question: "dvāḥ + atra → ______", options: ["dvār atra", "dvāḥ atra", "dvā atra"], answer: 0, explanation: "ルール §15.8.e: 語源的に r である dvāḥ の -ḥ は、後続の有声音 a の前で r に戻ります。したがって dvār atra が正解です。" },
+    { question: "dvāḥ + riktā → ______", options: ["dvā riktā", "dvāḥ riktā", "dvār riktā"], answer: 0, explanation: "ルール §15.8.e: 語源的に r である dvāḥ の -ḥ は、後続が r の場合、-ḥ は脱落します（前の ā は長母音のまま）。したがって dvā riktā が正解です。" },
+
+    // §16.1 (-k/ṭ/t/p + h)
+    { question: "samyak + hutam → ______", options: ["samyag ghutam", "samyak hutam", "samyag hutam"], answer: 0, explanation: "ルール §16.1: 語末の -k は後続の h と結合し、有声有気音の g gh になります。したがって samyag ghutam が正解です。" },
+    { question: "tat + hi → ______", options: ["tad dhi", "tat hi", "taj jhi"], answer: 0, explanation: "ルール §16.1: 語末の -t は後続の h と結合し、有声有気音の d dh になります。したがって tad dhi が正解です。" },
+    { question: "parivrāṭ + ha → ______", options: ["parivrāḍ ḍha", "parivrāṭ ha", "parivrāt tha"], answer: 0, explanation: "ルール §16.1: 語末の -ṭ は後続の h と結合し、有声有気音の ḍ ḍh になります。したがって parivrāḍ ḍha が正解です。" },
+    { question: "kakup + ha → ______", options: ["kakub bha", "kakup ha", "kakub ha"], answer: 0, explanation: "ルール §16.1: 語末の -p は後続の h と結合し、有声有気音の b bh になります。したがって kakub bha が正解です。" },
+
+    // §16.2 (ch after short vowel/ā/mā)
+    { question: "mā + chidat → ______", options: ["mā cchidat", "mā chidat", "mā śchidat"], answer: 0, explanation: "ルール §16.2: 否定辞 mā の後では、語頭の ch は cch になります。したがって mā cchidat が正解です。" },
+    { question: "tava + chāyā → ______", options: ["tava cchāyā", "tava chāyā", "tava śchāyā"], answer: 0, explanation: "ルール §16.2: 短母音の後では、語頭の ch は cch になります。したがって tava cchāyā が正解です。" },
+    { question: "ā + chāditaḥ → ______", options: ["ācchāditaḥ", "ā chāditaḥ", "āśchāditaḥ"], answer: 0, explanation: "ルール §16.2: 前接辞 ā の後では、語頭の ch は cch になります。したがって ācchāditaḥ が正解です。" },
+    { question: "sā + chinatti → ______", options: ["sā cchinatti", "sāc hinatti", "sā śchinatti"], answer: 0, explanation: "ルール §16.2備考: 長母音の後では、語頭の ch は任意で cch になります。sā cchinatti または sā chinatti の両方が可能です。ここでは sā cchinatti を正解とします。" }, // sā chinatti を選択肢から変更
+
+    // §16.3.c (ud + sthā/stambh)
+    { question: "ud + sthātum → ______", options: ["utthātum", "udsthātum", "utsthātum"], answer: 0, explanation: "ルール §16.3.c: 接頭辞 ud- の後で sthā- が続く場合、s が脱落し、t が th になります。したがって utthātum が正解です。" },
+    { question: "ud + stambhitaḥ → ______", options: ["uttambhitaḥ", "udstambhitaḥ", "utstambhitaḥ"], answer: 0, explanation: "ルール §16.3.c: 接頭辞 ud- の後で stambh- が続く場合、s が脱落し、t が th になります。したがって uttambhitaḥ が正解です。" }
+  ];
+  // === JavaScriptロジック (変更なし) ===
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  shuffle(quizData);
+  quizData.forEach(q => {
+    const correct = q.options[q.answer]; // Use 'answer' which is the index
+    shuffle(q.options);
+    q.correctIndex = q.options.indexOf(correct); // Find the new index after shuffle
+  });
+
+  let current = 0;
+  let correct = 0;
+  let wrongAnswers = [];
+
+  function renderQuestion() {
+    const q = quizData[current];
+    const quiz = document.getElementById("quiz");
+    quiz.innerHTML = "<div style='font-size:1.2em;margin-bottom:10px;'>Q" + (current+1) + ": " + q.question + "</div>";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerHTML = opt;
+      btn.onclick = () => {
+        document.querySelectorAll(".option-btn").forEach(b => b.disabled = true);
+        if (i === q.correctIndex) {
+          btn.style.backgroundColor = "#66bb6a";
+          correct++;
+        } else {
+          btn.style.backgroundColor = "#ef5350";
+          wrongAnswers.push(q);
+        }
+        const exp = document.createElement("div");
+        exp.className = "explanation-box";
+        exp.innerText = q.explanation;
+        quiz.appendChild(exp);
+        document.querySelector(".next-btn").style.display = "";
+      };
+      quiz.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    current++;
+    document.querySelector(".next-btn").style.display = "none";
+    if (current < quizData.length) {
+      renderQuestion();
+    } else {
+      // --- Quiz Finished ---
+      const rate = correct / quizData.length;
+      let color = rate >= 2/3 ? "green" : (rate >= 1/3 ? "orange" : "red");
+      let message = rate >= 2/3 ? "すばらしい！" : (rate >= 1/3 ? "あと一歩！" : "がんばろう！");
+
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = `
+        <div style='margin: 15px 0;'>
+          <h3 style='color:${color}; font-size: 2em;'>${message}</h3>
+          <p style='font-size: 1.3em;'>${quizData.length}問中、${correct}問正解です！</p>
+        </div>
+      `;
+
+      // --- Add Retry Button (if needed) ---
+      if (wrongAnswers.length > 0) {
+        const retry = document.createElement("button");
+        retry.innerText = "間違った問題に挑戦";
+        retry.style = "background:#ffb300;color:black;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
+        retry.onclick = () => {
+          quizData = wrongAnswers;
+          current = 0;
+          correct = 0;
+          wrongAnswers = [];
+          renderQuestion();
+        };
+        quizDiv.appendChild(retry);
+      }
+
+      // --- Add Back Button ---
+      const backBtn = document.createElement("button");
+      backBtn.innerText = "メニューに戻る";
+      backBtn.style = "background:#888;color:white;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
+      backBtn.onclick = () => location.reload();
+      quizDiv.appendChild(backBtn);
+    }
+  }
+
+  window.onload = () => {
+    renderQuestion();
+  };
+</script>
+</body>
+</html>
