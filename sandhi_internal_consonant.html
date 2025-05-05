@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>内連声 子音サンディクイズ</title> 
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      padding: 20px;
+    }
+    .option-btn {
+      display: block;
+      width: 80%;
+      max-width: 500px;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 1.1em;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      /* IAST表示のため */
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      line-height: 1.5;
+    }
+    .option-btn:disabled {
+      opacity: 1;
+      background: #eeeeee;
+      color: #333;
+      cursor: default;
+    }
+    .next-btn {
+      margin-top: 20px;
+      font-size: 1.2em;
+      padding: 10px 20px;
+      background: #42a5f5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .explanation-box {
+      background: #e3f2fd;
+      padding: 10px;
+      margin: 20px auto;
+      max-width: 500px;
+      border-radius: 6px;
+      font-size: 1em;
+      text-align: left;
+    }
+    /* IAST表示のため */
+    #quiz div {
+        font-family: 'Arial', 'Helvetica', sans-serif;
+        line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div id="quiz-container">
+  <h1 style="color:#1e88e5;">内連声 子音サンディクイズ</h1> 
+  <div id="quiz"></div>
+  <button class="next-btn" onclick="nextQuestion()" style="display:none;">次へ</button>
+</div>
+<script>
+  // === 内連声・子音サンディデータ ===
+  let quizData = [ // 変数名を quizData に戻す
+    // §18.1 (Final Consonant + Vowel/Semivowel/Nasal = No Change)
+    { question: "marut + e → ______", options: ["marute", "marude", "marutte"], answer: 0, explanation: "ルール §18.1: 語幹末の子音 -t は、母音 e で始まる語尾の前では変化しません。したがって marute が正解です。" },
+    { question: "vāc + ya → ______", options: ["vācya", "vākya", "vāja"], answer: 0, explanation: "ルール §18.1: 語幹末の子音 -c は、半母音 y で始まる接尾辞の前では変化しません。したがって vācya が正解です。" },
+    { question: "vac + mi → ______", options: ["vacmi", "vagmi", "vakmi"], answer: 0, explanation: "ルール §18.1: 語幹末の子音 -c は、鼻音 m で始まる語尾の前では変化しません。したがって vacmi が正解です。" },
+
+    // §18.2 (Final Consonant + Consonant (other than Semi/Nasal) = External Sandhi Rules Often Apply)
+    { question: "marut + bhyaḥ → ______", options: ["marudbhyaḥ", "marutbhyaḥ", "marubhyaḥ"], answer: 0, explanation: "ルール §18.2: 語幹末の -t は、子音 bh で始まる語尾の前では外連声と同様に d に変化します。したがって marudbhyaḥ が正解です。" },
+    { question: "agnimath + bhiḥ → ______", options: ["agnimadbhiḥ", "agnimathbhiḥ", "agnimatbhiḥ"], answer: 0, explanation: "ルール §18.2: 語幹末の -th は、子音 bh で始まる語尾の前では外連声と同様に d に変化します。したがって agnimadbhiḥ が正解です。" },
+    { question: "agnimath + su → ______", options: ["agnimatsu", "agnimathsu", "agnimadsu"], answer: 0, explanation: "ルール §18.2, §13: 語幹末の -th は絶対語末形 t となり、s の前では変化しません。したがって agnimatsu が正解です。" },
+    { question: "sudṛś + bhiḥ → ______", options: ["sudṛgbhiḥ", "sudṛśbhiḥ", "sudṛḍbhiḥ"], answer: 0, explanation: "ルール §18.2, §13: 語幹末の -ś は絶対語末形 k となり、有声音 bh の前で g になります。したがって sudṛgbhiḥ が正解です。" },
+    { question: "madhulih + bhiḥ → ______", options: ["madhuliḍbhiḥ", "madhulihbhiḥ", "madhulitbhiḥ"], answer: 0, explanation: "ルール §18.2, §13: 語幹末の -h は絶対語末形 ṭ となり、有声音 bh の前で ḍ になります。したがって madhuliḍbhiḥ が正解です。" },
+    { question: "madhulih + su → ______", options: ["madhulitsu", "madhulihsu", "madhulikṣu"], answer: 0, explanation: "ルール §18.2, §13: 語幹末の -h は絶対語末形 ṭ となり、s の前では変化しません。したがって madhulitsu が正解です。" },
+    { question: "kāmaduh + bhiḥ → ______", options: ["kāmadhugbhiḥ", "kāmaduhbhiḥ", "kāmadukbhiḥ"], answer: 0, explanation: "ルール §18.2, §13: 語幹末の -h は絶対語末形 k となり、有声音 bh の前で g になります。したがって kāmadhugbhiḥ が正解です。" },
+    { question: "kāmaduh + su → ______", options: ["kāmadhukṣu", "kāmaduhsu", "kāmadhutsu"], answer: 0, explanation: "ルール §18.2, §13: 語幹末の -h は絶対語末形 k となり、s の前で kṣ に変化します。したがって kāmadhukṣu が正解です。" },
+    { question: "manas + bhiḥ → ______", options: ["manobhiḥ", "manasbhiḥ", "manaḥbhiḥ"], answer: 0, explanation: "ルール §18.2: 語幹末の -as は、子音 bh で始まる語尾の前では外連声と同様に o に変化します。したがって manobhiḥ が正解です。" },
+    { question: "manas + su → ______", options: ["manaḥsu", "manassu", "manasu"], answer: 0, explanation: "ルール §18.2: 語幹末の -as は、子音 s で始まる語尾の前では外連声と同様に aḥ (manaḥsu) または as (manassu) になります。ここでは manaḥsu を正解とします。" },
+    { question: "jyotis + bhiḥ → ______", options: ["jyotirbhiḥ", "jyotisbhiḥ", "jyotibhiḥ"], answer: 0, explanation: "ルール §18.2: 語幹末の -is は、子音 bh で始まる語尾の前では外連声と同様に ir に変化します。したがって jyotirbhiḥ が正解です。" },
+    { question: "jyotis + su → ______", options: ["jyotiḥṣu", "jyotissu", "jyotisu"], answer: 0, explanation: "ルール §18.2: 語幹末の -is は、子音 s で始まる語尾の前では外連声と同様に iḥ (jyotiḥṣu) または is (jyotissu) になります。ここでは jyotiḥṣu を正解とします。（ṣuへの変化も含む）" },
+
+    // §18.3 (Verb Endings - Often follow External Sandhi)
+    { question: "ad + ti → ______", options: ["atti", "adi", "ati"], answer: 0, explanation: "ルール §18.3: 語根末の -d は、接尾辞 -ti の前で t に同化します。したがって atti が正解です。" },
+    { question: "vac + ti → ______", options: ["vakti", "vacti", "vagti"], answer: 0, explanation: "ルール §18.3, §13: 語根末の -c は絶対語末形 k となり、接尾辞 -ti の前で変化しません。したがって vakti が正解です。" },
+    { question: "labh + sye → ______", options: ["lapsye", "labhsye", "labdhye"], answer: 0, explanation: "ルール §18.3: 語根末の -bh は、接尾辞 -sye の前で無声化し p になります。したがって lapsye が正解です。" },
+    { question: "ās + dhve → ______", options: ["ādhve", "ās dhve", "āddhve"], answer: 0, explanation: "ルール §18.3: 語根末の -s は、接尾辞 -dhve の前で脱落します(?)。したがって ādhve が正解です。（※この例は規則性がやや不明瞭）" },
+    { question: "rundh + dhve → ______", options: ["runddhve", "rundh dhve", "run dhve"], answer: 0, explanation: "ルール §18.3: 語根末の -dh は、接尾辞 -dhve の前で d になります。したがって runddhve が正解です。" },
+
+    // §18.4 (Voiced Aspirate + t/th > Voiced Stop + dh)
+    { question: "budh + ta → ______", options: ["buddha", "budhta", "butta"], answer: 0, explanation: "ルール §18.4: 語根末の -dh は、接尾辞 -ta の前で d になり、t は dh に変化します。したがって buddha が正解です。" },
+    { question: "labh + ta → ______", options: ["labdha", "labhta", "lapta"], answer: 0, explanation: "ルール §18.4: 語根末の -bh は、接尾辞 -ta の前で b になり、t は dh に変化します。したがって labdha が正解です。" },
+    { question: "rundh + thāḥ → ______", options: ["runddhāḥ", "rundhthāḥ", "runtthāḥ"], answer: 0, explanation: "ルール §18.4: 語根末の -dh は、接尾辞 -thāḥ の前で d になり、th は dh に変化します。したがって runddhāḥ が正解です。" },
+
+    // §18.5.a (-h + t/th/dh > -ḍh-, preceded by short vowel ( lengthened))
+    { question: "lih + ta → ______", options: ["līḍha", "lihta", "likta"], answer: 0, explanation: "ルール §18.5.a: 語根末の -h は接尾辞 -ta の前で ḍh になり、先行する短母音 i は ī に長音化します。したがって līḍha が正解です。" },
+    { question: "lih + dhve → ______", options: ["līḍhve", "lihdhve", "ligdhve"], answer: 0, explanation: "ルール §18.5.a: 語根末の -h は接尾辞 -dhve の前で ḍh になり、先行する短母音 i は ī に長音化します。したがって līḍhve が正解です。" },
+    { question: "dṛh + ta → ______", options: ["dṛḍha", "dṛhta", "dṛkta"], answer: 0, explanation: "ルール §18.5.a: 語根末の -h は接尾辞 -ta の前で ḍh になります（先行母音ṛは長音化せず）。したがって dṛḍha が正解です。" },
+
+    // §18.5.b (-h + t/th/dh > -gdh-)
+    { question: "dah + ta → ______", options: ["dagdha", "dahta", "dakta"], answer: 0, explanation: "ルール §18.5.b: 語根末の -h は接尾辞 -ta の前で gdh に変化します。したがって dagdha が正解です。" },
+    { question: "duh + thāḥ → ______", options: ["dugdhāḥ", "duhthāḥ", "dukthāḥ"], answer: 0, explanation: "ルール §18.5.b: 語根末の -h は接尾辞 -thāḥ の前で gdh に変化します。したがって dugdhāḥ が正解です。" },
+    { question: "duh + dhi → ______", options: ["dugdhi", "duhdhi", "duktdhi"], answer: 0, explanation: "ルール §18.5.b: 語根末の -h は接尾辞 -dhi の前で gdh に変化します。したがって dugdhi が正解です。" },
+
+    // §18.5.c (nah + ta > naddha)
+    { question: "nah + ta → ______", options: ["naddha", "nahta", "nāḍha"], answer: 0, explanation: "ルール §18.5.c: 語根 nah- の -h は接尾辞 -ta の前で ddh になります。したがって naddha が正解です。" },
+
+    // §18.5.d (vah/sah exceptions)
+    { question: "vah + ta → ______", options: ["ūḍha", "vahta", "vagdha"], answer: 0, explanation: "ルール §18.5.d: 語根 vah- は接尾辞 -ta の前で特殊な変化をし ūḍha となります。" },
+    { question: "vah + tum → ______", options: ["voḍhum", "vahtum", "vagdhum"], answer: 0, explanation: "ルール §18.5.d: 語根 vah- は接尾辞 -tum の前で特殊な変化をし voḍhum となります。" },
+    { question: "sah + tum → ______", options: ["soḍhum", "sahtum", "saghdhum"], answer: 0, explanation: "ルール §18.5.d: 語根 sah- は接尾辞 -tum の前で特殊な変化をし soḍhum となります。" },
+
+    // §18.6 (Retroflex + Dental > Retroflex + Retroflex)
+    { question: "iḍ + te → ______", options: ["īṭṭe", "iḍte", "iṭte"], answer: 0, explanation: "ルール §18.6: 語根末の反舌音 ḍ は、後続の歯音 t の前で ṭ に変化させ、自身も ṭ になります（長音化も伴う）。したがって īṭṭe が正解です。" },
+    { question: "iṣ + ta → ______", options: ["iṣṭa", "ista", "iṣta"], answer: 0, explanation: "ルール §18.6: 語根末の反舌音 ṣ は、後続の歯音 t を ṭ に変化させます。したがって iṣṭa が正解です。" },
+    { question: "dviṣ + dhi → ______", options: ["dviḍḍhi", "dviṣdhi", "dviṣṭi"], answer: 0, explanation: "ルール §18.6: 語根末の反舌音 ṣ は、後続の歯音 dh を ḍh に変化させ、自身は ḍ になります。したがって dviḍḍhi が正解です。" },
+    { question: "mṛd + nāti → ______", options: ["mṛdṇāti", "mṛdnāti", "mṛṇṇāti"], answer: 0, explanation: "ルール §18.6: 語根末の反舌音 ḍ は、後続の歯音 n を ṇ に変化させます。したがって mṛdṇāti が正解です。" },
+
+    // §18.7 (-j + t > -kṭa / -ṣṭa)
+    { question: "yuj + ta → ______", options: ["yukta", "yujta", "yuṣṭa"], answer: 0, explanation: "ルール §18.7: 語根末の -j は接尾辞 -ta の前で k になります。したがって yukta が正解です。" },
+    { question: "sṛj + ta → ______", options: ["sṛṣṭa", "sṛjta", "sṛkta"], answer: 0, explanation: "ルール §18.7: 語根末の -j は接尾辞 -ta の前で ṣ になる場合があります。したがって sṛṣṭa が正解です。" },
+
+    // §18.8 (-ś + t > -ṣṭa)
+    { question: "dṛś + ta → ______", options: ["dṛṣṭa", "dṛśta", "dṛkta"], answer: 0, explanation: "ルール §18.8: 語根末の -ś は接尾辞 -ta の前で ṣ になります。したがって dṛṣṭa が正解です。" },
+
+    // §19.1 (n > ṇ Cerebralisation)
+    { question: "kar + ana → ______", options: ["karaṇa", "karana", "kalana"], answer: 0, explanation: "ルール §19.1: r の後にある n は、間に母音(a)が介在しても ṇ に変化します。したがって karaṇa が正解です。" },
+    { question: "brahman + ya → ______", options: ["brahmaṇya", "brahmanya", "brahmayya"], answer: 0, explanation: "ルール §19.1: r の後にある n は、間に母音(a)や子音(h, m)が介在しても ṇ に変化します。したがって brahmaṇya が正解です。" },
+    { question: "gṛh + nāti → ______", options: ["gṛhṇāti", "gṛhnāti", "gṛhyāti"], answer: 0, explanation: "ルール §19.1: ṛ の後にある n は、間に子音(h)が介在しても ṇ に変化します。したがって gṛhṇāti が正解です。" },
+    { question: "pari + nayati → ______", options: ["pariṇayati", "parinayati", "pariyayati"], answer: 0, explanation: "ルール §19.1 備考2: 接頭辞 pari- の後では、語根の n は ṇ に変化します。したがって pariṇayati が正解です。" },
+    { question: "pra + nita → ______", options: ["praṇīta", "pranita", "prayita"], answer: 0, explanation: "ルール §19.1 備考2: 接頭辞 pra- の後では、語根の n は ṇ に変化します。したがって praṇīta が正解です。（ita内のiも影響）" },
+    { question: "pra + ni + patati → ______", options: ["praṇipatati", "pranipatati", "prapatati"], answer: 0, explanation: "ルール §19.1 備考2: 接頭辞 pra- の後では、接頭辞 ni- の n も ṇ に変化します。したがって praṇipatati が正解です。" },
+
+    // §19.2 (s > ṣ Cerebralisation)
+    { question: "agni + su → ______", options: ["agniṣu", "agnisu", "agnīṣu"], answer: 0, explanation: "ルール §19.2: i の後にある s は、後続の母音 u の前では ṣ に変化します。したがって agniṣu が正解です。" },
+    { question: "kāmaduh + su → ______", options: ["kāmadhukṣu", "kāmaduhṣu", "kāmadutsu"], answer: 0, explanation: "ルール §19.2, §13: -h > -k となり、さらに u の後のため s が ṣ に変化し kṣ となります。したがって kāmadhukṣu が正解です。" },
+    { question: "dhanus + su → ______", options: ["dhanuḥṣu", "dhanuṣṣu", "dhanusu"], answer: 0, explanation: "ルール §19.2: u の後の s は、後続の s の前で ḥ または s のままの後、後続の s が ṣ に変化します。したがって dhanuḥṣu が一般的です。（dhanuṣṣuも可）" },
+    { question: "jyotis + su → ______", options: ["jyotiḥṣu", "jyotiṣṣu", "jyotisu"], answer: 0, explanation: "ルール §19.2: i の後の s は、後続の s の前で ḥ または s のままの後、後続の s が ṣ に変化します。したがって jyotiḥṣu が一般的です。（jyotiṣṣuも可）" },
+    { question: "abhi + siñcati → ______", options: ["abhiṣiñcati", "abhisincati", "abhisṛjati"], answer: 0, explanation: "ルール §19.2 備考: 接頭辞 abhi- (iの後)の後では、語根の s は ṣ に変化します。したがって abhiṣiñcati が正解です。" },
+
+    // §20.1 (-r + Consonant = No Change)
+    { question: "bibhar + ti → ______", options: ["bibharti", "bibhahati", "bibhrati"], answer: 0, explanation: "ルール §20.1: 語根末の -r は、子音 t で始まる語尾の前では変化しません。したがって bibharti が正解です。" },
+    { question: "bibhar + si → ______", options: ["bibharṣi", "bibharsi", "bibharti"], answer: 0, explanation: "ルール §20.1, §19.2: 語根末の -r は変化しませんが、後続の s は r の影響で ṣ になります。したがって bibharṣi が正解です。" },
+
+    // §20.2 (Final k/c/ś/ch/j/ś/s/kṣ/h + s > kṣ)
+    { question: "sṛj + syati → ______", options: ["srakṣyati", "sṛjsyati", "sraṣṭā"], answer: 0, explanation: "ルール §20.2: 語根末の -j は、後続の s の前で kṣ に変化します。したがって srakṣyati が正解です。" },
+    { question: "veś + syati → ______", options: ["vekṣyati", "veśsyati", "veṣyati"], answer: 0, explanation: "ルール §20.2: 語根末の -ś は、後続の s の前で kṣ に変化します。したがって vekṣyati が正解です。" },
+    { question: "dveṣ + si → ______", options: ["dvekṣi", "dveṣsi", "dveṭsi"], answer: 0, explanation: "ルール §20.2, §19.2: 語根末の -ṣ は、後続の s の前で kṣ に変化します。したがって dvekṣi が正解です。" },
+    { question: "leh + si → ______", options: ["lekṣi", "lehsi", "leḍhi"], answer: 0, explanation: "ルール §20.2, §19.2: 語根末の -h は、後続の s の前で kṣ に変化します。したがって lekṣi が正解です。" },
+    { question: "doh + si → ______", options: ["dhokṣi", "dohsi", "dogdhi"], answer: 0, explanation: "ルール §20.2, §13.7: 語根末の -h は、後続の s の前で kṣ に変化します(doh->dhokの母音変化も伴う)。したがって dhokṣi が正解です。" },
+    { question: "nah + syati → ______", options: ["natsyati", "nahsyati", "nakṣyati"], answer: 0, explanation: "ルール §20.2 例外: 語根 nah- の末尾 -h は、後続の s の前で t に変化します。したがって natsyati が正解です。" },
+
+    // §20.3 (Final n/m + Consonant = Often Dropped or Anusvāra)
+    { question: "gam + ta → ______", options: ["gata", "gamta", "ganta"], answer: 0, explanation: "ルール §20.3: 語根末の -m は、接尾辞 -ta の前でしばしば脱落します。したがって gata が正解です。" },
+    { question: "han + ta → ______", options: ["hata", "hanta", "hata"], answer: 0, explanation: "ルール §20.3: 語根末の -n は、接尾辞 -ta の前でしばしば脱落します。したがって hata が正解です。" },
+    { question: "gam + tum → ______", options: ["gantum", "gatum", "gamtum"], answer: 0, explanation: "ルール §20.3: 語根末の -m は、接尾辞 -tum の前では脱落せず、n になる場合があります。したがって gantum が正解です。" },
+    { question: "han + tum → ______", options: ["hantum", "hatum", "hantum"], answer: 0, explanation: "ルール §20.3: 語根末の -n は、接尾辞 -tum の前では脱落しません。したがって hantum が正解です。" },
+    { question: "jan + ta → ______", options: ["jāta", "janta", "jata"], answer: 0, explanation: "ルール §20.3 特例: 語根 jan- は接尾辞 -ta の前で特殊な変化をし jāta となります。" },
+    { question: "śram + ta → ______", options: ["śrānta", "śramta", "śrata"], answer: 0, explanation: "ルール §20.3 特例: 語根 śram- は接尾辞 -ta の前で特殊な変化をし śrānta となります。" },
+    { question: "man + syate → ______", options: ["maṁsyate", "mansyate", "manasyate"], answer: 0, explanation: "ルール §20.3: 語根末の -n は、後続の歯擦音 s の前で ṁ になります。したがって maṁsyate が正解です。" },
+    { question: "yam + syati → ______", options: ["yaṁsyati", "yamsyati", "yayasyati"], answer: 0, explanation: "ルール §20.3: 語根末の -m は、後続の歯擦音 s の前で ṁ になります。したがって yaṁsyati が正解です。" },
+    { question: "jagam + vān → ______", options: ["jaganvān", "jagamvān", "jagavān"], answer: 0, explanation: "ルール §20.3: 語根末の -m は、後続の v の前で n になる場合があります。したがって jaganvān が正解です。" },
+
+    // §20.4 (-c/-j + n > -cñ-/-jñ-)
+    { question: "yāc + nā → ______", options: ["yācñā", "yācnā", "yākñā"], answer: 0, explanation: "ルール §20.4: 語根末の -c は、後続の n の前で cñ になります。したがって yācñā が正解です。" },
+    { question: "yaj + na → ______", options: ["yajña", "yajna", "yakña"], answer: 0, explanation: "ルール §20.4: 語根末の -j は、後続の n の前で jñ になります。したがって yajña が正解です。" }
+];
+
+  // === JavaScriptロジック (他ファイルと共通) ===
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  shuffle(quizData);
+  quizData.forEach(q => {
+    const correct = q.options[q.answer]; // Use 'answer' which is the index
+    shuffle(q.options);
+    q.correctIndex = q.options.indexOf(correct); // Find the new index after shuffle
+  });
+
+  let current = 0;
+  let correct = 0;
+  let wrongAnswers = [];
+
+  function renderQuestion() {
+    const q = quizData[current];
+    const quiz = document.getElementById("quiz");
+    quiz.innerHTML = "<div style='font-size:1.2em;margin-bottom:10px;'>Q" + (current+1) + ": " + q.question + "</div>";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerHTML = opt;
+      btn.onclick = () => {
+        document.querySelectorAll(".option-btn").forEach(b => b.disabled = true);
+        if (i === q.correctIndex) {
+          btn.style.backgroundColor = "#66bb6a";
+          correct++;
+        } else {
+          btn.style.backgroundColor = "#ef5350";
+          wrongAnswers.push(q);
+        }
+        const exp = document.createElement("div");
+        exp.className = "explanation-box";
+        exp.innerText = q.explanation;
+        quiz.appendChild(exp);
+        document.querySelector(".next-btn").style.display = "";
+      };
+      quiz.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    current++;
+    document.querySelector(".next-btn").style.display = "none";
+    if (current < quizData.length) {
+      renderQuestion();
+    } else {
+      // --- Quiz Finished ---
+      const rate = correct / quizData.length;
+      let color = rate >= 2/3 ? "green" : (rate >= 1/3 ? "orange" : "red");
+      let message = rate >= 2/3 ? "すばらしい！" : (rate >= 1/3 ? "あと一歩！" : "がんばろう！");
+
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = `
+        <div style='margin: 15px 0;'>
+          <h3 style='color:${color}; font-size: 2em;'>${message}</h3>
+          <p style='font-size: 1.3em;'>${quizData.length}問中、${correct}問正解です！</p>
+        </div>
+      `;
+
+      // --- Add Retry Button (if needed) ---
+      if (wrongAnswers.length > 0) {
+        const retry = document.createElement("button");
+        retry.innerText = "間違った問題に挑戦";
+        retry.style = "background:#ffb300;color:black;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
+        retry.onclick = () => {
+          quizData = wrongAnswers;
+          current = 0;
+          correct = 0;
+          wrongAnswers = [];
+          renderQuestion();
+        };
+        quizDiv.appendChild(retry);
+      }
+
+      // --- Add Back Button ---
+      const backBtn = document.createElement("button");
+      backBtn.innerText = "メニューに戻る";
+      backBtn.style = "background:#888;color:white;margin:10px auto;font-size:1em;padding:10px 20px;border:none;border-radius:6px;display:block;";
+      backBtn.onclick = () => window.location.href = 'index.html'; // Go back to index.html
+      quizDiv.appendChild(backBtn);
+    }
+  }
+
+  window.onload = () => {
+    renderQuestion();
+  };
+</script>
+</body>
+</html>
